@@ -56,7 +56,7 @@ for (let i = 0; i < init_sports.length; i++) {
                     pa = 1;
                 }
             }
-            //Üëëá áèëÞìáôá
+            //Î¬Î»Î»Î± Î±Î¸Î»Î®Î¼Î±Ï„Î±
             return [ph, pa];
         }
     };
@@ -124,11 +124,11 @@ if (init_group_structure === "default")
     }
     for (let m = 0; m < matches.length; m++) {
         for (let r = 0; r < rounds.length; r++) {
-            if (rounds[r].available === true)//áí õðÜñ÷åé êåíü ãÞðåäï
+            if (rounds[r].available === true)//Î±Î½ Ï…Ï€Î¬ÏÏ‡ÎµÎ¹ ÎºÎµÎ½ÏŒ Î³Î®Ï€ÎµÎ´Î¿
             {
                 let team1 = matches[m].th;
                 let team2 = matches[m].ta;
-                let scheduled = false;//áí ôçí óõãêåêñéìÝíç çìÝñá, óôçí óõãêåêñéìÝíç æþíç êáé óôï óõãêåêñéìÝíï rank ôçò æþíçò Ý÷åé ðñïãñáììáôéóôåß íá ðáßæåé ç ßäéá ïìÜäá êÜôé Üëëï
+                let scheduled = false;//Î±Î½ Ï„Î·Î½ ÏƒÏ…Î³ÎºÎµÎºÏÎ¹Î¼Î­Î½Î· Î·Î¼Î­ÏÎ±, ÏƒÏ„Î·Î½ ÏƒÏ…Î³ÎºÎµÎºÏÎ¹Î¼Î­Î½Î· Î¶ÏŽÎ½Î· ÎºÎ±Î¹ ÏƒÏ„Î¿ ÏƒÏ…Î³ÎºÎµÎºÏÎ¹Î¼Î­Î½Î¿ rank Ï„Î·Ï‚ Î¶ÏŽÎ½Î·Ï‚ Î­Ï‡ÎµÎ¹ Ï€ÏÎ¿Î³ÏÎ±Î¼Î¼Î±Ï„Î¹ÏƒÏ„ÎµÎ¯ Î½Î± Ï€Î±Î¯Î¶ÎµÎ¹ Î· Î¯Î´Î¹Î± Î¿Î¼Î¬Î´Î± ÎºÎ¬Ï„Î¹ Î¬Î»Î»Î¿
 
                 for (let rm = 0; rm < matches.length; rm++)
                 {
