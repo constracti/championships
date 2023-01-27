@@ -149,7 +149,7 @@ if (init_group_structure === "default")
             }
         }
     }
-    for (let m = 0; m < matches.length; m++) {
+    for (let m = 0; m < matches.length; m++) {//θέλει διόρθωση αυτό
         if (matches[m].round === -1) {
             alert("No solution found for sport " + sports[k]);
             break;
