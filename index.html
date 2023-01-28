@@ -1,27 +1,72 @@
-<!doctype html>
-<meta charset="UTF-8">
-<html>
-    <head>
-        <title>Championhips</title>
-    </head>
-    <body>
-        <h1>Testing</h1>
-        <div>
-            <label>ομάδες:</label><br>
-            <textarea name="teams" placeholder="Enter team names separated by newline" rows="10"></textarea><br>
-            <label>Δομή ομίλων:</label><br>
-            <input name="grstructure" placeholder="Enter group structure" /><br>
-            <label>Ζώνες:</label><br>
-            <textarea name="zones" placeholder="Enter zone names separated by newline" rows="2"></textarea><br>
-            <label>Γύροι:</label><br>
-            <input name="rounds" placeholder="Enter number of rounds per zone" /><br>
-            <label>Αθλήματα:</label><br>
-            <textarea name="sports" placeholder="Enter sport names separated by newline" rows="3"></textarea><br>
-            <label>Ημερομηνία αρχής</label><br>
-            <input type="date" name="start" /><br>
-            <label>Ημερομηνία αργότερου τέλους</label><br>
-            <input type="date" name="end" /><br>
-        </div>
-        <script src="test.js"></script>
-    </body>
+<!DOCTYPE html>
+<!--
+TODO we are addressing a greek community; translate text to user-friendly greek descriptions; however, use only english in the js file
+-->
+<html lang="el">
+	<head>
+		<meta charset="UTF-8">
+		<title>Ομαδικά Πρωταθλήματα</title>
+	</head>
+	<body>
+		<h1>Ομαδικά Πρωταθλήματα</h1>
+		<form>
+			<p>
+				<label>
+					<span>Ομάδες:</span>
+					<span style="color: red;">*</span>
+					<br>
+					<textarea name="teams" required="required" placeholder="Enter team names separated by newline" rows="10"></textarea>
+				</label>
+			</p>
+			<p>
+				<label>
+					<span>Δομή ομίλων:</span>
+					<br>
+					<input name="grstructure" placeholder="Enter group structure">
+				</label>
+			</p>
+			<p>
+				<label>
+					<span>Ζώνες:</span>
+					<br>
+					<textarea name="zones" placeholder="Enter zone names separated by newline" rows="2"></textarea>
+				</label>
+			</p>
+			<p>
+				<label>
+					<span>Γύροι:</span>
+					<br>
+					<input name="rounds" placeholder="Enter number of rounds per zone">
+				</label>
+			</p>
+			<p>
+				<label>
+					<span>Αθλήματα:</span>
+					<span style="color: red;">*</span>
+					<br>
+					<textarea name="sports" required="required" placeholder="Enter sport names separated by newline" rows="3"></textarea>
+				</label>
+			</p>
+			<p>
+				<label>
+					<span>Ημερομηνία αρχής</span>
+					<span style="color: red;">*</span>
+					<br>
+					<input type="date" name="start" required="required">
+				</label>
+			</p>
+			<p>
+				<label>
+					<span>Ημερομηνία αργότερου τέλους</span>
+					<span style="color: red;">*</span>
+					<br>
+					<input type="date" name="end" required="required">
+				</label>
+			</p>
+			<p>
+				<button type="submit">Υποβολή</button>
+			</p>
+		</form>
+		<script src="test.js"></script>
+	</body>
 </html>

@@ -1,3 +1,52 @@
+document.addEventListener('DOMContentLoaded', function() {
+	console.log('ready');
+
+	const form = document.forms[0];
+
+	const form_teams = form['teams'];
+	// example input value for testing
+	form_teams.value = [
+		'Φωτοδότες',
+		'Αγωνιστές',
+		'Φωτοδόχοι',
+		'Πρόμαχοι',
+		'Τροπαιοφόροι',
+		'Ακλόνητοι',
+		'Υψιπέτες',
+		'Πιστοί',
+		'Ηρωικοί',
+		'Ελπιδοφόροι',
+		'Σταθεροί',
+	].join('\n');
+
+	const form_sports = form['sports'];
+	// example input value for testing
+	form_sports.value = [
+		'Ποδόσφαιρο',
+		'Μπάσκετ',
+		'Βόλεϊ',
+		'Μπέισμπολ',
+	].join('\n');
+
+	const form_date_start = form['start'];
+	// example input value for testing
+	form_date_start.value = '2022-08-10';
+
+	const form_date_stop = form['end'];
+	// example input value for testing
+	form_date_stop.value = '2022-08-22';
+
+	// TODO define constants here
+
+	form.addEventListener('submit', function(event) {
+		console.log('submit!');
+		event.preventDefault();
+
+		// TODO run algorith here
+	});
+});
+
+
 let matches = [];
 let teams = [];
 let groups = [];
@@ -5,13 +54,13 @@ let zones = [];
 let rounds = [];
 let sports = [];
 
-let t = document.getElementsByName("teams");
-let gs = document.getElementsByName("grstructure");
-let z = document.getElementsByName("zones");
-let r = document.getElementsByName("rounds");
-let s = document.getElementsByName("sports");
-let sd = document.getElementsByName("start");
-let ed = document.getElementsByName("end");
+let t = document.getElementsByName('teams');
+let gs = document.getElementsByName('grstructure');
+let z = document.getElementsByName('zones');
+let r = document.getElementsByName('rounds');
+let s = document.getElementsByName('sports');
+let sd = document.getElementsByName('start');
+let ed = document.getElementsByName('end');
 
 let init_teams = t[0].value.trim().split('\n');
 let init_group_structure = gs[0].value.trim().toLowerCase();
@@ -21,7 +70,9 @@ let init_sports = s[0].value.trim().split('\n');
 const init_start_date = new Date(sd[0].value);
 const init_end_date = new Date(ed[0].value);
 
-let difference = (init_end_date.getTime() - init_start_date.getTime())/(1000*60*60*24);
+let difference = (init_end_date.getTime() - init_start_date.getTime()) / (1000 * 60 * 60 * 24);
+
+// TODO use tabs instead of spaces for indentation
 
 for (let i = 0; i < init_teams.length; i++) {
     team =
@@ -40,7 +91,7 @@ for (let i = 0; i < init_sports.length; i++) {
         {
             let ph;
             let pa;
-            if (sport.name === "football")
+            if (sport.name === 'football')
             {
                 if (sh > sa) {
                     ph = 3;
@@ -93,11 +144,11 @@ for (let d = 0; d <= difference; d++)
 }
 for ( let i = 0; i < rounds.length; i++)
 {
-    rounds[i]["id"] = i;
+    rounds[i]['id'] = i;
 }
 
 
-if (init_group_structure === "default")
+if (init_group_structure === 'default')
 {
     for (let k = 0; k < sports.length; k++)
     {
@@ -105,7 +156,7 @@ if (init_group_structure === "default")
         {
             sport: sports[k],
             teams: teams,
-            structure: "default"
+            structure: 'default'
         };
         groups.push(group)
         for (let i = 0; i < group.teams.length - 1; i++) {
@@ -151,7 +202,7 @@ if (init_group_structure === "default")
     }
     for (let m = 0; m < matches.length; m++) {//θέλει διόρθωση αυτό
         if (matches[m].round === -1) {
-            alert("No solution found for sport " + sports[k]);
+            alert('No solution found for sport ' + sports[k]);
             break;
         }
     } 
