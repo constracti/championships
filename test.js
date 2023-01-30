@@ -3,29 +3,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	const form = document.forms[0];
 
-	const form_teams = form['teams'];
+	const form_teams = form.teams;
 	// example input value for testing
 	form_teams.value = [
 		'Φωτοδότες',
 		'Αγωνιστές',
 		'Τροπαιοφόροι',
 		'Πρόμαχοι',
-	/*	'Σταθεροί',
-		'Ακλόνητοι',
-		'Υψιπέτες',
-		'Πιστοί',
-		'Ηρωικοί',
-		'Ελπιδοφόροι',
-		'Φωτοδόχοι',*/ //this name is very frustrating when you try to debug and you have 'Φωτοδό-' 2 times...
 	].join('\n');
 
-	const form_sports = form['sports'];
+	const form_sports = form.sports;
 	// example input value for testing
 	form_sports.value = [
 		'Ποδόσφαιρο',
 		'Μπάσκετ',
-	/*	'Βόλεϊ',
-		'Μπέισμπολ',*/
 	].join('\n');
 
 	const form_date_start = form['start'];
@@ -51,16 +42,36 @@ document.addEventListener('DOMContentLoaded', function() {
 	// example input value for testing
 	form_rounds.value = 2;
 
+	const points_fn_obj = {
+		'ποδόσφαιρο': (sh, sa) => {
+			if (sh > sa)
+				return [3, 0];
+			else if (sh < sa)
+				return [0, 3];
+			else
+				return [1, 1];
+		},
+		'μπάσκετ': (sh, sa) => {
+			if (sh > sa)
+				return [2, 1];
+			else if (sh < sa)
+				return [1, 2];
+			else
+				throw 'ισοπαλία στο μπάσκετ;';
+		},
+	};
+
 	// TODO define constants here -> Done.
 
+	let teams = null;
+	let sports = null;
 	let matches = [];
-	let teams = [];
 	let groups = [];
 	let zones = [];
 	let rounds = [];
-	let sports = [];
 
 	let t = document.getElementsByName('teams'); //could optimize that with the above form consts...
+	// TODO that's the point... use constants with descriptive names and access them as form elements
 	let gs = document.getElementsByName('grstructure');
 	let z = document.getElementsByName('zones');
 	let r = document.getElementsByName('rounds');
@@ -68,69 +79,47 @@ document.addEventListener('DOMContentLoaded', function() {
 	let sd = document.getElementsByName('start');
 	let ed = document.getElementsByName('end');
 
-	let init_teams = t[0].value.trim().split('\n');
+	// TODO even initializations should be done on the submit event; they are part of the algorith
 	let init_group_structure = gs[0].value.trim().toLowerCase();
 	let init_zone = z[0].value.trim().split('\n');
 	let init_number_of_rounds = r[0].value.trim().toLowerCase();
-	let init_sports = s[0].value.trim().split('\n');
 	const init_start_date = new Date(sd[0].value);
 	const init_end_date = new Date(ed[0].value);
 
 	let difference = (init_end_date.getTime() - init_start_date.getTime()) / (1000 * 60 * 60 * 24);
 
 	form.addEventListener('submit', function(event) {
-		console.log('submit!');
+		console.log('submit');
 		event.preventDefault();
 
 		// TODO run algorith here -> Done.
 
-
-		// TODO use tabs instead of spaces for indentation -> Done.
-		console.log(init_teams);
-		for (let i = 0; i < init_teams.length; i++) {
-			team =
-			{
-				id: i,
-				name: init_teams[i]
+		teams = form_teams.value.split('\n').map(name => name.trim()).filter(name => name.length).map(function(name, id) {
+			return {
+				id: id,
+				name: name,
 			};
-			teams.push(team);
-		}
+		});
+		console.log('teams:\n' + teams.map(team => `${team.id}: ${team.name}`).join('\n'));
+		//teams.forEach(team => console.log(`${team.id}: ${team.name}`));
 
-		for (let i = 0; i < init_sports.length; i++) {
-			sport =
-			{
-				name: init_sports[i],
-				points: (sh, sa) => {
-					let ph;
-					let pa;
-					if (sport.name === 'ποδόσφαιρο'.trim().toLowerCase()) {
-						if (sh > sa) {
-							ph = 3;
-							pa = 0;
-						}
-						else if (sh < sa) {
-							ph = 0;
-							pa = 3;
-						}
-						else {
-							ph = 1;
-							pa = 1;
-						}
-					}
-					//more sports
-					return [ph, pa];
-				}
+		sports = form_sports.value.split('\n').map(name => name.trim().toLowerCase()).filter(name => name.length).map(function(name, id) {
+			return {
+				id: id,
+				name: name,
+				points_fn: points_fn_obj[name],
 			};
-			sports.push(sport);
-		}
+		});
+		console.log('sports:\n' + sports.map(sport => `${sport.id}: ${sport.name}`).join('\n'));
 
-
+		// TODO try to code in a functional programming style as in teams and sports
+		// produce rounds (aka "slots")
 		for (let d = 0; d <= difference; d++) {
 			for (let i = 0; i < init_zone.length; i++) {
-				zone =
+				zone = // TODO variables not declared with a const/let/var keyword become global; in this case, const is prefered
 				{
 					id: i,
-					name: init_zone[i]
+					name: init_zone[i] // TODO terminate last line of multiline object / list expressions with a comma for scalability
 				};
 				for (let k = 0; k < sports.length; k++) {
 					for (let j = 0; j < init_number_of_rounds; j++) {
@@ -138,8 +127,8 @@ document.addEventListener('DOMContentLoaded', function() {
 						{
 							sport: sports[k],
 							id: 0,
-							date: new Date(init_start_date.getFullYear(), init_start_date.getMonth(), init_start_date.getDate() + d).toDateString(),
-							zone: zone.id,
+							date: new Date(init_start_date.getFullYear(), init_start_date.getMonth(), init_start_date.getDate() + d).toDateString(), // TODO see comments @ https://stackoverflow.com/a/34324394/6884847
+							zone: zone.id, // IDEA you may reference the object; it's just a pointer!
 							rank: j,
 							available: true
 						};
@@ -163,9 +152,10 @@ document.addEventListener('DOMContentLoaded', function() {
 					structure: 'default'
 				};
 				groups.push(group)
+				// TODO cleaner approach: (i = 0; i < length) (j = i + 1; j < length)
 				for (let i = 0; i < group.teams.length - 1; i++) {
 					for (let j = i; j < group.teams.length - 1; j++) {
-						match =
+						match = // TODO use null for unset values (sh, sa, round)
 						{
 							th: group.teams[i],
 							ta: group.teams[j + 1],
@@ -185,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
 						let team2 = matches[m].ta;
 						let scheduled = false;//If in this specific date, in a specific zone and rank a team is scheduled to play something else.
 
-						for (let rm = 0; rm < matches.length; rm++) {
+						for (let rm = 0; rm < matches.length; rm++) { // TODO more efficient match grouping
 							if (matches[rm].round !== -1) {
 								if (rounds[r].date === rounds[matches[rm].round].date && rounds[r].rank === rounds[matches[rm].round].rank && rounds[r].zone === rounds[matches[rm].round].zone && (matches[rm].th === team1 || matches[rm].ta === team1 || matches[rm].th === team2 || matches[rm].ta === team2)) {
 									scheduled = true;
@@ -214,6 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		console.log(matches);
 		console.log(groups);
 		console.log(rounds);
+		// TODO output to console or html in a human-readable format, as in the excel printable tab
 	});
 });
 
