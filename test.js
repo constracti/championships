@@ -1,5 +1,8 @@
+import * as scheduler from './scheduling_algorithms.js';
 document.addEventListener('DOMContentLoaded', function ()
 {
+	
+	
 	console.log('ready');
 
 	const form = document.forms[0];
@@ -126,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function ()
 			{
 				for (let j = 0; j < form_rounds.value; j++)
 				{
-					round =
+					let round =
 					{
 						rank: 0,
 						date: new Date(init_start_date.getFullYear(), init_start_date.getMonth(), init_start_date.getDate() + d).toDateString(), // TODO see comments @ https://stackoverflow.com/a/34324394/6884847
@@ -142,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function ()
 			
 			for (let k = 0; k < sports.length; k++)
 			{
-				slot =
+				let slot =
 				{
 					sport: sports[k],
 					round: rounds[i],
@@ -170,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function ()
 		{
 			for (let k = 0; k < sports.length; k++)
 			{
-				group =
+				let group =
 				{
 					sport: sports[k],
 					teams: teams,
@@ -182,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function ()
 				{
 					for (let j = i; j < group.teams.length - 1; j++)
 					{
-						match = // TODO use null for unset values (sh, sa, round) -> Done.
+						let match = // TODO use null for unset values (sh, sa, round) -> Done.
 						{
 							th: group.teams[i],
 							ta: group.teams[j + 1],
@@ -196,53 +199,7 @@ document.addEventListener('DOMContentLoaded', function ()
 				}
 			}
 
-			//Here is the scheduling for default structure. Working on making it a recursive function that every time a match is placed in a slot, it calls itself after it pops the match, to schedule the next one until all matches are placed in a slot.
-			for (let r = 0; r < rounds.length; r++)//for every round
-			{
-				for (let s = 0; s < slots.length; s++)//for every slot in this round
-				{
-					for (let m = 0; m < matches.length; m++)
-					{
-						if (slots[s].available === true)//if there is an empty court
-						{
-							let team1 = matches[m].th;
-							let team2 = matches[m].ta;
-							let scheduled = false;//If in this specific date, in a specific zone and rank a team is scheduled to play something else (1)
-
-							for (let sp = 0; sp < sports.length; sp++)
-							{
-								for (let j = 0; j < rounds[r][sports[sp].name].length; j++)
-								{
-									if (rounds[r][sports[sp].name][j].match !== null)
-									{
-										if (rounds[r][sports[sp].name][j].match.th === team1 || rounds[r][sports[sp].name][j].match.ta === team1 || rounds[r][sports[sp].name][j].match.th === team2 || rounds[r][sports[sp].name][j].match.ta === team2)
-										{
-											scheduled = true;
-											break;
-										}
-									}
-									if (scheduled)
-									{
-										break;
-									}
-								}
-							}
-
-
-							if (!scheduled)
-							{
-								slots[s].match = matches[m];
-								slots[s].available = false;
-								break;
-							}
-						}
-						else
-						{
-							break;
-						}
-					}
-				}
-			}
+			scheduler.ScheduleMatchesDefault(matches,rounds,slots,sports);
 		}
 		for (let m = 0; m < matches.length; m++) 
 		{//not finished
