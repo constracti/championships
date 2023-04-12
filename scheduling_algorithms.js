@@ -3,7 +3,6 @@ export function ScheduleMatchesDefault(matches,rounds,slots,sports)
 {
 	if (matches.length === 0)
 	{
-		console.log("end");
 		return true;
 	}
 	else
@@ -15,12 +14,15 @@ export function ScheduleMatchesDefault(matches,rounds,slots,sports)
 			{
 				for (let m = 0; m < matches.length; m++)
 				{
-					if (slots[s].available === true)//if there is an empty court
+					//RULES
+					//if there is an empty court (1)
+					if (slots[s].available === true)
 					{
 						let team1 = matches[m].th;
 						let team2 = matches[m].ta;
-						let scheduled = false;//If in this specific date, in a specific zone and rank a team is scheduled to play something else (1)
-
+						let scheduled = false;
+						
+						//If in this specific date, in a specific zone and rank a team is scheduled to play something else (2)
 						for (let sp = 0; sp < sports.length; sp++)
 						{
 							for (let j = 0; j < rounds[r][sports[sp].name].length; j++)
@@ -39,8 +41,27 @@ export function ScheduleMatchesDefault(matches,rounds,slots,sports)
 								}
 							}
 						}
+
+						//If this match is present in the same sport already (3)
+						for (let sl = 0; sl < slots.length; sl++)
+						{
+							if (slots[sl].match !== null)
+							{
+								if ((slots[sl].match.th === team1 || slots[sl].match.ta === team1) && (slots[sl].match.th === team2 || slots[sl].match.ta === team2) && (slots[sl].match.sport.name === slots[s].sport.name))
+								{
+									scheduled = true;
+									break;
+								}
+							}
+						}
+
+						//other rules we may need for sheduling (for example a round may not have the default amount of slots)
+						//END of RULES
+
+
 						if (!scheduled)
 						{
+							matches[m].sport=slots[s].sport;
 							slots[s].match = matches[m];
 							slots[s].available = false;
 							let newMatches = matches.filter((element) => element !== matches[m]);

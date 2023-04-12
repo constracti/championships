@@ -192,11 +192,12 @@ document.addEventListener('DOMContentLoaded', function ()
 							sh: null,
 							sa: null,
 							//slot: null,
-							//i would like to include 'sport' here.
+							sport: null, //xD
 						};
 						matches.push(match);
 					}
 				}
+
 			}
 
 			scheduler.ScheduleMatchesDefault(matches,rounds,slots,sports);
