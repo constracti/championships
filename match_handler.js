@@ -1,15 +1,12 @@
-export function Displayer(matches, rounds, slots, sports, groups)//other parameters are not used right now but in the future they might be
-{
+export function Displayer(matches, rounds, slots, sports, groups){//other parameters are not used right now but in the future they might be
 	let title = document.createElement("div");
 	let titleSpan = document.createElement("span");
 	titleSpan.innerHTML = "<h2>Schedule<h2>";
 	title.appendChild(titleSpan);
 	document.body.appendChild(title);
 
-	for (let i = 0; i < slots.length; i++)
-	{
-		if (slots[i].match !== null)
-		{
+	for (let i = 0; i < slots.length; i++){
+		if (slots[i].match !== null){
 			let match = document.createElement("div");
 
 			match.className = "match";
@@ -58,8 +55,3 @@ export function Displayer(matches, rounds, slots, sports, groups)//other paramet
 		}	
 	}
 }
-	
-
-
-
-

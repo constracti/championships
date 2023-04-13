@@ -1,31 +1,27 @@
 import * as scheduler from './scheduling_algorithms.js';
 import * as display from './match_handler.js';
 
-document.addEventListener('DOMContentLoaded', function ()
-{
-	
-	
+document.addEventListener('DOMContentLoaded', function () {
+
 	console.log('ready');
 
 	const form = document.forms[0];
 
 	const form_teams = form.teams;
 	// example input value for testing
-	form_teams.value =
-		[
+	form_teams.value =[
 			'Φωτοδότες',
 			'Αγωνιστές',
 			'Τροπαιοφόροι',
 			'Πρόμαχοι',
-		].join('\n');
+			].join('\n');
 
 	const form_sports = form.sports;
 	// example input value for testing
-	form_sports.value =
-		[
+	form_sports.value =[
 			'Ποδόσφαιρο',
 			'Μπάσκετ',
-		].join('\n');
+			].join('\n');
 
 	const form_date_start = form['start'];
 	// example input value for testing
@@ -41,18 +37,16 @@ document.addEventListener('DOMContentLoaded', function ()
 
 	const form_zones = form['zones'];
 	// example input value for testing
-	form_zones.value =
-		[
+	form_zones.value =[
 			'Πρωινή',
 			'Απογευματινή',
-		].join('\n');
+			].join('\n');
 
 	const form_rounds = form['rounds'];
 	// example input value for testing
 	form_rounds.value = 2;
 
-	const points_fn_obj =
-	{
+	const points_fn_obj ={
 		'ποδόσφαιρο': (sh, sa) => {
 			if (sh > sa)
 				return [3, 0];
@@ -89,16 +83,14 @@ document.addEventListener('DOMContentLoaded', function ()
 
 	let difference = (init_end_date.getTime() - init_start_date.getTime()) / (1000 * 60 * 60 * 24);
 
-	form.addEventListener('submit', function (event)
-	{
+	form.addEventListener('submit', function (event){
 		let res=false;
 		console.log('submit');
 		event.preventDefault();
 
 		// TODO run algorith here -> Done.
 
-		teams = form_teams.value.split('\n').map(name => name.trim()).filter(name => name.length).map(function (name, id)
-		{
+		teams = form_teams.value.split('\n').map(name => name.trim()).filter(name => name.length).map(function (name, id){
 			return {
 				id: id,
 				name: name,
@@ -107,8 +99,7 @@ document.addEventListener('DOMContentLoaded', function ()
 		console.log('teams:\n' + teams.map(team => `${team.id}: ${team.name}`).join('\n'));
 		//teams.forEach(team => console.log(`${team.id}: ${team.name}`));
 
-		sports = form_sports.value.split('\n').map(name => name.trim().toLowerCase()).filter(name => name.length).map(function (name, id)
-		{
+		sports = form_sports.value.split('\n').map(name => name.trim().toLowerCase()).filter(name => name.length).map(function (name, id){
 			return {
 				id: id,
 				name: name,
@@ -119,21 +110,16 @@ document.addEventListener('DOMContentLoaded', function ()
 
 		// TODO try to code in a functional programming style as in teams and sports -> Done?
 
-		zones = form_zones.value.split('\n').map(zone => zone.trim()).filter(zone => zone.length).map(function (zone, index)
-		{
+		zones = form_zones.value.split('\n').map(zone => zone.trim()).filter(zone => zone.length).map(function (zone, index){
 			return {
 				id: index,
 				name: zone,
 			};
 		});
-		for (let d = 0; d <= difference; d++)
-		{
-			for (let i = 0; i < zones.length; i++)
-			{
-				for (let j = 0; j < form_rounds.value; j++)
-				{
-					let round =
-					{
+		for (let d = 0; d <= difference; d++){
+			for (let i = 0; i < zones.length; i++){
+				for (let j = 0; j < form_rounds.value; j++){
+					let round ={
 						rank: 0,
 						date: new Date(init_start_date.getFullYear(), init_start_date.getMonth(), init_start_date.getDate() + d).toDateString(), // TODO see comments @ https://stackoverflow.com/a/34324394/6884847
 						zone: zones[i], // IDEA you may reference the object; it's just a pointer! -> Done.
@@ -143,15 +129,10 @@ document.addEventListener('DOMContentLoaded', function ()
 				}
 			}
 		}
-		for (let i = 0; i < rounds.length; i++)
-		{
-			rounds[i]['rank'] = i;
-
-			
-			for (let k = 0; k < sports.length; k++)
-			{
-				let slot =
-				{
+		for (let i = 0; i < rounds.length; i++){
+			rounds[i]['rank'] = i;	
+			for (let k = 0; k < sports.length; k++){
+				let slot ={
 					sport: sports[k],
 					round: rounds[i],
 					available: true,
@@ -160,8 +141,7 @@ document.addEventListener('DOMContentLoaded', function ()
 				slots.push(slot);
 			}
 			
-			for (let k = 0; k < sports.length; k++)
-			{
+			for (let k = 0; k < sports.length; k++){
 				rounds[i][sports[k].name]=[];
 				//for (let j = 0; j < slots.length; j++)
 				//{
@@ -174,24 +154,18 @@ document.addEventListener('DOMContentLoaded', function ()
 		}
 
 
-		if (form_grstructure.value === 'default')//all teams in one group 
-		{
-			for (let k = 0; k < sports.length; k++)
-			{
-				let group =
-				{
+		if (form_grstructure.value === 'default') {//all teams in one group
+			for (let k = 0; k < sports.length; k++){
+				let group ={
 					sport: sports[k],
 					teams: teams,
 					structure: 'default',
 				};
 				groups.push(group)
 				// TODO cleaner approach: (i = 0; i < length) (j = i + 1; j < length)
-				for (let i = 0; i < group.teams.length - 1; i++)
-				{
-					for (let j = i; j < group.teams.length - 1; j++)
-					{
-						let match = // TODO use null for unset values (sh, sa, round) -> Done.
-						{
+				for (let i = 0; i < group.teams.length - 1; i++){
+					for (let j = i; j < group.teams.length - 1; j++){
+						let match = {// TODO use null for unset values (sh, sa, round) -> Done.
 							th: group.teams[i],
 							ta: group.teams[j + 1],
 							sh: null,
@@ -205,14 +179,10 @@ document.addEventListener('DOMContentLoaded', function ()
 
 			}
 			res = scheduler.ScheduleMatchesDefault(matches, rounds, slots, sports);
-			display.Displayer(matches, rounds, slots, sports)
-
-			
+			display.Displayer(matches, rounds, slots, sports);
 		}
-		for (let m = 0; m < matches.length; m++) //will be deleted
-		{//not finished
-			if (matches[m].round === -1) 
-			{
+		for (let m = 0; m < matches.length; m++) {//will be deleted
+			if (matches[m].round === -1) {
 				alert('No solution found, try to decrease the number of teams or extend the period of the schedule.\
 					\n\nKeep in mind that for the time being the scheduling algorithm is nowhere near its final state and cannot find a good solution.');
 				break;
