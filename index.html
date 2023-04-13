@@ -3,6 +3,44 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>Ομαδικά Πρωταθλήματα</title>
+		<style>
+			.match {
+				display: flex;
+				align-items: center;
+				justify-content: left;
+				font-size: 20px;
+				gap: 5px;
+				padding: 5px;
+			}
+
+			.team {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+			}
+
+			input[type="number"] {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				width: 35px;
+				text-align: center;
+				font-size: 20px;
+				border: 1px solid gray;
+				border-radius: 4px;
+				background-color: transparent;
+				box-shadow: inset 0px 0px 2px 1px #dddddd;
+			}
+
+			input[type='number'] {
+				-moz-appearance: textfield;
+			}
+
+			input::-webkit-outer-spin-button,
+			input::-webkit-inner-spin-button {
+				-webkit-appearance: none;
+			}
+		</style>
 	</head>
 	<body>
 		<h1>Ομαδικά Πρωταθλήματα</h1>
@@ -64,6 +102,6 @@
 				<button type="submit">Υποβολή</button>
 			</p>
 		</form>
-		<script type="module" src="test.js"></script>
+		<script type="module" src="championships.js"></script>
 	</body>
 </html>

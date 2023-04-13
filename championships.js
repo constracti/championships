@@ -1,4 +1,6 @@
 import * as scheduler from './scheduling_algorithms.js';
+import * as display from './match_handler.js';
+
 document.addEventListener('DOMContentLoaded', function ()
 {
 	
@@ -89,6 +91,7 @@ document.addEventListener('DOMContentLoaded', function ()
 
 	form.addEventListener('submit', function (event)
 	{
+		let res=false;
 		console.log('submit');
 		event.preventDefault();
 
@@ -119,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function ()
 		zones = form_zones.value.split('\n').map(zone => zone.trim()).filter(zone => zone.length).map(function (zone, index)
 		{
 			return {
-				rank: index,
+				id: index,
 				name: zone,
 			};
 		});
@@ -134,6 +137,7 @@ document.addEventListener('DOMContentLoaded', function ()
 						rank: 0,
 						date: new Date(init_start_date.getFullYear(), init_start_date.getMonth(), init_start_date.getDate() + d).toDateString(), // TODO see comments @ https://stackoverflow.com/a/34324394/6884847
 						zone: zones[i], // IDEA you may reference the object; it's just a pointer! -> Done.
+						zrank: j,
 					};
 					rounds.push(round);
 				}
@@ -142,6 +146,7 @@ document.addEventListener('DOMContentLoaded', function ()
 		for (let i = 0; i < rounds.length; i++)
 		{
 			rounds[i]['rank'] = i;
+
 			
 			for (let k = 0; k < sports.length; k++)
 			{
@@ -158,13 +163,13 @@ document.addEventListener('DOMContentLoaded', function ()
 			for (let k = 0; k < sports.length; k++)
 			{
 				rounds[i][sports[k].name]=[];
-				for (let j = 0; j < slots.length; j++)
-				{
-					if (slots[j].sport.name === sports[k].name && slots[j].round.rank===i)
-					{
-						rounds[i][sports[k].name].push(slots[j]);
-					}	
-				}
+				//for (let j = 0; j < slots.length; j++)
+				//{
+				//	if (slots[j].sport.name === sports[k].name && slots[j].round.rank===i)
+				//	{
+				//		rounds[i][sports[k].name].push(slots[j]);
+				//	}	
+				//}
 			}
 		}
 
@@ -199,10 +204,12 @@ document.addEventListener('DOMContentLoaded', function ()
 				}
 
 			}
+			res = scheduler.ScheduleMatchesDefault(matches, rounds, slots, sports);
+			display.Displayer(matches, rounds, slots, sports)
 
-			scheduler.ScheduleMatchesDefault(matches,rounds,slots,sports);
+			
 		}
-		for (let m = 0; m < matches.length; m++) 
+		for (let m = 0; m < matches.length; m++) //will be deleted
 		{//not finished
 			if (matches[m].round === -1) 
 			{
@@ -217,7 +224,3 @@ document.addEventListener('DOMContentLoaded', function ()
 		console.table(slots);
 	});
 });
-
-
-
-
