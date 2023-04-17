@@ -47,55 +47,10 @@
 		<form>
 			<p>
 				<label>
-					<span>Ομάδες:</span>
+					<span>Διαμόρφωση</span>
 					<span style="color: red;">*</span>
 					<br>
-					<textarea name="teams" required="required" placeholder="Γράψε εδώ τις ομάδες που θα συμμετέχουν, διαχώρισέ τις με enter" rows="10"></textarea>
-				</label>
-			</p>
-			<p>
-				<label>
-					<span>Δομή ομίλων:</span>
-					<br>
-					<input name="grstructure" placeholder="Γράψε εδώ την δομή των ομίλων όλων των πρωταθλημάτων (γράψε default για την προκαθορισμένη)"><!-- Εδώ για κάθε άθλημα μελλοντικά θα χρειαστεί ίσως να υπάρχει άλλη δομή. Better use a select element. In any case, for the time being, we may delete this input element and restore it when needed. -->
-				</label>
-			</p>
-			<p>
-				<label>
-					<span>Ζώνες:</span>
-					<br>
-					<textarea name="zones" placeholder="Γράψε εδώ τα ονόματα των ζωνών των πρωταθλημάτων κάθε ημέρας, διαχώρισέ τις με enter (πρωινή, απογευματινή κλπ)" rows="2"></textarea>
-				</label>
-			</p>
-			<p>
-				<label>
-					<span>Γύροι:</span>
-					<br>
-					<input name="rounds" placeholder="Γράψε εδώ πόσους γύρους θα έχουν τα πρωταθλήματα ανά ζώνη">
-				</label>
-			</p>
-			<p>
-				<label>
-					<span>Αθλήματα:</span>
-					<span style="color: red;">*</span>
-					<br>
-					<textarea name="sports" required="required" placeholder="Γράψε εδώ τα αθλήματα για τα οποία θες να φτιαχτεί πρωτάθλημα, διαχώρισέ τα με enter " rows="3"></textarea>
-				</label>
-			</p>
-			<p>
-				<label>
-					<span>Ημερομηνία αρχής</span>
-					<span style="color: red;">*</span>
-					<br>
-					<input type="date" name="start" required="required">
-				</label>
-			</p>
-			<p>
-				<label>
-					<span>Ημερομηνία αργότερου τέλους</span>
-					<span style="color: red;">*</span>
-					<br>
-					<input type="date" name="end" required="required">
+					<textarea name="config" required="required" rows="30" style="width: 100%;"></textarea>
 				</label>
 			</p>
 			<p>
