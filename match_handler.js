@@ -1,22 +1,24 @@
-export function Displayer(matches, rounds, slots, sports, groups){//other parameters are not used right now but in the future they might be
+function Displayer(matches, rounds, slots, sports, groups){//other parameters are not used right now but in the future they might be
 	let title = document.createElement("div");
 	let titleSpan = document.createElement("span");
 	titleSpan.innerHTML = "<h2>Schedule<h2>";
 	title.appendChild(titleSpan);
 	document.body.appendChild(title);
+	let m=0;
 
 	for (let i = 0; i < slots.length; i++){
 		if (slots[i].match !== null){
 			let match = document.createElement("div");
+			m+=1
 
 			match.className = "match";
 			let slot = document.createElement("div");
 			let slotSpan = document.createElement("span");
-			slotSpan.innerHTML = `<b>Round:</b> ${slots[i].round.rank} <b>Date:</b> ${slots[i].round.date}, <b>Zone:</b> ${slots[i].round.zone.name} ${slots[i].round.zrank}, <b>Sport:</b> ${slots[i].sport.name} |  ` ;
+			slotSpan.innerHTML = `<b>Match:</b> ${m} <b>Date:</b> ${slots[i].round.date.toJSON().split('T')[0]}, <b>Zone:</b> ${slots[i].round.zone} ${slots[i].round.rank}, <b>Sport:</b> ${slots[i].sport.name}, <b>Court:</b> ${slots[i].court} |  ` ;
 
 			let team1 = document.createElement("div");
 			let team1Span = document.createElement("span");
-			team1Span.innerHTML = slots[i].match.th.name;
+			team1Span.innerHTML = slots[i].match.team_home.name;
 			let score1 = document.createElement("div");
 			let score1Input = document.createElement("input");
 			score1Input.type = "number";
@@ -35,7 +37,7 @@ export function Displayer(matches, rounds, slots, sports, groups){//other parame
 
 			let team2 = document.createElement("div");
 			let team2Span = document.createElement("span");
-			team2Span.innerHTML = slots[i].match.ta.name;
+			team2Span.innerHTML = slots[i].match.team_away.name;
 
 			slot.appendChild(slotSpan);
 			team1.appendChild(team1Span);

@@ -1,5 +1,5 @@
-import * as scheduler from './scheduling_algorithms.js';
-import * as display from './match_handler.js';
+//import * as scheduler from './scheduling_algorithms.js';
+//import * as display from './match_handler.js';
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -39,6 +39,11 @@ document.addEventListener('DOMContentLoaded', function() {
 		},
 	};
 
+	const courts = {
+		'ποδόσφαιρο': ["Ποδόσφαιρο Καινούργιο", "Ποδόσφαιρο Παλαιό"],
+		'μπάσκετ': ["Μπάσκετ"],
+	};
+
 	form.addEventListener('submit', function(event) {
 
 		try {
@@ -55,26 +60,42 @@ document.addEventListener('DOMContentLoaded', function() {
 				name: name,
 			}));
 			console.log('teams:\n' + teams.map(team => `${team.id}: ${team.name}`).join('\n'));
-			// TODO assert teams name property is unique
+			// TODO assert teams name property is unique -> Done.
+			teams.forEach(team => {
+				if (teams.filter(t=>t.name===team.name).length>1)
+					throw new Error(`Team names are not unique: ${team.name}`);
+			});
 
 			// build sports
 			const sports = config.sports.map(name => name.trim()).filter(name => name.length).map((name, id) => ({
 				id: id,
 				name: name,
 				points_fn: points_fn_obj[name],
+				courts:courts[name],
 			}));
 			sports.forEach(sport => {
 				if (!(sport.name.toLowerCase() in points_fn_obj))
 					throw new Error(`points_fn not found for sport ${sport.name}`);
+				if (!(sport.name.toLowerCase() in courts))
+					throw new Error(`courts not found for sport ${sport.name}`);
 				sport.points_fn = points_fn_obj[sport.name.toLowerCase()];
+				sport.courts = courts[sport.name.toLowerCase()];
 			});
 			console.log('sports:\n' + sports.map(sport => `${sport.id}: ${sport.name}`).join('\n'));
-			// TODO assert sports name property is unique
+			// TODO assert sports name property is unique -> Done.
+			sports.forEach(sport => {
+				if (sports.filter(s=>s.name===sport.name).length>1)
+					throw new Error(`Sport names are not unique: ${sport.name}`);
+			});
 
 			// build zones
 			const zones = config.zones.map(name => name.trim()).filter(name => name.length);
 			console.log('zones:\n' + zones.join('\n'));
-			// TODO assert zones name property is unique
+			// TODO assert zones name property is unique -> Done.
+			zones.forEach(zone => {
+				if (zones.filter(z=>z===zone).length>1)
+					throw new Error(`Zone names are not unique: ${zone.name}`);
+			});
 
 			// produce rounds
 			const rounds = [];
@@ -98,19 +119,31 @@ document.addEventListener('DOMContentLoaded', function() {
 						date: date,
 						zone: zone,
 						rank: c,
-						// TODO slots dictionary
+						// TODO slots dictionary-> Done below. Every round has sport slots.
 					});
 			});
+			for (let i =0; i<rounds.length; i++){
+				for (let k = 0; k < sports.length; k++){
+					rounds[i][sports[k].name]=[];
+				}
+			}
+			
 			console.log('rounds:\n' + rounds.map(round => `${round.date.toJSON().split('T')[0]} ${round.zone} ${round.rank}`).join('\n'));
 
 			// produce slots
-			// TODO support courts
+			// TODO support courts -> Done. (i suppose)
 			const slots = rounds.map(round => {
-				return sports.map(sport => ({
-					round: round,
-					sport: sport,
-					match: null,
-				}));
+				return sports.map(sport => {
+					return sport.courts.map(court=>{
+						return {
+							round: round,
+							sport: sport,
+							court: court,
+							match: null,
+							available: true,
+						};
+					});
+				}).flat();
 			}).flat();
 			console.log('slots: ' + slots.length);
 
@@ -134,15 +167,13 @@ document.addEventListener('DOMContentLoaded', function() {
 				});
 			});
 			console.log('matches: ' + matches.length);
+			// TODO remove this statement and adapt following functions -> Done.
 
-			return; // TODO remove this statement and adapt following functions
-
-			const result = scheduler.ScheduleMatchesDefault(matches, rounds, slots, sports);
-			display.Displayer(matches, rounds, slots, sports);
+			ScheduleMatchesDefault(matches, rounds, slots, sports);
+			Displayer(matches, rounds, slots, sports);
 
 		} catch (error) {
 			alert(error);
 		}
-
 	});
 });
