@@ -3,7 +3,7 @@ An HTML-JS application to plan championships.
 
 ## version
 
-0.1
+0.2
 
 ## configuration
 
@@ -18,7 +18,7 @@ A configuration JSON string is provided through a `textarea` element in the foll
     "Πρόμαχοι"
   ],
   "sports": [
-    "Ποδόσφαιρο",
+    "Ποδόσφαιρο: Π Ποδόσφαιρο, Κ Ποδόσφαιρο",
     "Μπάσκετ"
   ],
   "zones": [
