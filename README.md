@@ -60,6 +60,15 @@ Algorithm produces objects structured as documented below:
  */
 ```
 
+### court
+
+```js
+/**
+ * @typedef court
+ * @type {string} - trimmed, unique
+ */
+```
+
 ### sport
 
 ```js
@@ -90,6 +99,7 @@ Algorithm produces objects structured as documented below:
  * @property {Date} date
  * @property {zone} zone
  * @property {number} rank - positive integer used for ordering
+ * @property {Object.<court, slot>} slots
  */
 ```
 
@@ -100,7 +110,8 @@ Algorithm produces objects structured as documented below:
  * @typedef slot
  * @type {object}
  * @property {round} round
- * @property {sport} sport
+ * @property {court} court
+ * @property {?match} match
  */
 ```
 
@@ -110,6 +121,7 @@ Algorithm produces objects structured as documented below:
 /**
  * @typedef match
  * @type {object}
+ * @property {sport} sport
  * @property {?slot} slot
  * @property {team} team_home
  * @property {team} team_away

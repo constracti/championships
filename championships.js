@@ -1,5 +1,6 @@
-//import * as scheduler from './scheduling_algorithms.js';
-//import * as display from './match_handler.js';
+Error.prototype.alert = function() {
+	alert(`${this.fileName}:${this.lineNumber}:${this.columnNumber} ${this.toString()}`);
+};
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -17,11 +18,11 @@ document.addEventListener('DOMContentLoaded', function() {
 			form['config'].value = data;
 		});
 	} catch (error) {
-		alert(error);
+		error.alert();
 	}
 
 	const points_fn_obj = {
-		'ποδόσφαιρο': (sh, sa) => {
+		'Ποδόσφαιρο': (sh, sa) => {
 			if (sh > sa)
 				return [3, 0];
 			else if (sh < sa)
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			else
 				return [1, 1];
 		},
-		'μπάσκετ': (sh, sa) => {
+		'Μπάσκετ': (sh, sa) => {
 			if (sh > sa)
 				return [2, 1];
 			else if (sh < sa)
@@ -37,11 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			else
 				throw 'ισοπαλία στο μπάσκετ;';
 		},
-	};
-
-	const courts = {
-		'ποδόσφαιρο': ["Ποδόσφαιρο Καινούργιο", "Ποδόσφαιρο Παλαιό"],
-		'μπάσκετ': ["Μπάσκετ"],
 	};
 
 	form.addEventListener('submit', function(event) {
@@ -55,47 +51,69 @@ document.addEventListener('DOMContentLoaded', function() {
 			console.log(config);
 
 			// build teams
-			const teams = config.teams.map(name => name.trim()).filter(name => name.length).map((name, id) => ({
+			const teams = config.teams.map((name, id) => ({
 				id: id,
-				name: name,
+				name: name.trim(),
 			}));
-			console.log('teams:\n' + teams.map(team => `${team.id}: ${team.name}`).join('\n'));
-			// TODO assert teams name property is unique -> Done.
+			// check teams for empty or duplicate name
 			teams.forEach(team => {
-				if (teams.filter(t=>t.name===team.name).length>1)
-					throw new Error(`Team names are not unique: ${team.name}`);
+				if (!team.name.length)
+					throw new Error('empty team name');
+				if (teams.filter(t => t.name === team.name).length !== 1)
+					throw new Error(`duplicate team name: ${team.name}`);
 			});
+			console.log('teams: ' + teams.length + '\n' + teams.map(team => `${team.id}: ${team.name}`).join('\n'));
 
-			// build sports
-			const sports = config.sports.map(name => name.trim()).filter(name => name.length).map((name, id) => ({
-				id: id,
-				name: name,
-				points_fn: points_fn_obj[name],
-				courts:courts[name],
-			}));
-			sports.forEach(sport => {
-				if (!(sport.name.toLowerCase() in points_fn_obj))
-					throw new Error(`points_fn not found for sport ${sport.name}`);
-				if (!(sport.name.toLowerCase() in courts))
-					throw new Error(`courts not found for sport ${sport.name}`);
-				sport.points_fn = points_fn_obj[sport.name.toLowerCase()];
-				sport.courts = courts[sport.name.toLowerCase()];
+			// produce courts and build sports
+			const courts = [];
+			const sports = config.sports.map((line, id) => {
+				let [sport_name, sport_courts] = line.split(':', 2);
+				sport_name = sport_name.trim();
+				if (sport_courts !== undefined)
+					sport_courts = Array.from(new Set(sport_courts.split(',').map(court_name => court_name.trim())));
+				else
+					sport_courts = [sport_name];
+				sport_courts.forEach(court_name => {
+					if (!courts.includes(court_name))
+						courts.push(court_name);
+				});
+				if (!(sport_name in points_fn_obj))
+					throw new Error(`points_fn not found for sport ${sport_name}`);
+				return {
+					id: id,
+					name: sport_name,
+					points_fn: points_fn_obj[sport_name],
+					courts: sport_courts,
+				};
 			});
-			console.log('sports:\n' + sports.map(sport => `${sport.id}: ${sport.name}`).join('\n'));
-			// TODO assert sports name property is unique -> Done.
-			sports.forEach(sport => {
-				if (sports.filter(s=>s.name===sport.name).length>1)
-					throw new Error(`Sport names are not unique: ${sport.name}`);
+			// check courts for empty name
+			courts.forEach(name => {
+				if (!name.length)
+					throw new Error('empty court name');
 			});
+			console.log('courts: ' + courts.length + '\n' + courts.join('\n'));
+			// check sports for empty or duplicate name
+			sports.forEach(sport => {
+				if (!sport.name.length)
+					throw new Error('empty sport name');
+				if (sports.filter(s => s.name === sport.name).length !== 1)
+					throw new Error(`duplicate sport name: ${sport.name}`);
+			});
+			console.log('sports: ' + sports.length + '\n' + sports.map(sport => `${sport.id}: ${sport.name} (${sport.courts.join(', ')})`).join('\n'));
 
 			// build zones
-			const zones = config.zones.map(name => name.trim()).filter(name => name.length);
-			console.log('zones:\n' + zones.join('\n'));
-			// TODO assert zones name property is unique -> Done.
+			const zones = config.zones.map((name, id) => ({
+				rank: id,
+				name: name.trim(),
+			}));
+			// check zones for empty or duplicate name
 			zones.forEach(zone => {
-				if (zones.filter(z=>z===zone).length>1)
-					throw new Error(`Zone names are not unique: ${zone.name}`);
+				if (!zone.name.length)
+					throw new Error('empty zone name');
+				if (zones.filter(z => z.name === zone.name).length !== 1)
+					throw new Error(`duplicate zone name: ${zone.name}`);
 			});
+			console.log('zones: ' + zones.length + '\n' + zones.map(zone => zone.name).join('\n'));
 
 			// produce rounds
 			const rounds = [];
@@ -104,47 +122,40 @@ document.addEventListener('DOMContentLoaded', function() {
 				if (!line.length)
 					return [];
 				if (line.length != 3)
-					throw new Error(`rounds line ${i}: not valid`);
+					throw new Error(`rounds line ${i+1}: not valid`);
 				const date = new Date(line[0]);
 				if (date.toString() === 'Invalid Date')
-					throw new Error(`rounds line ${i}: not valid date`);
-				const zone = zones.filter(zone => zone === line[1])[0];
+					throw new Error(`rounds line ${i+1}: not valid date`);
+				const zone = zones.filter(zone => zone.name === line[1])[0];
 				if (zone === undefined)
-					throw new Error(`rounds line ${i}: not valid zone`);
+					throw new Error(`rounds line ${i+1}: not valid zone`);
 				const count = parseInt(line[2]);
 				if (count < 0)
-					throw new Error(`rounds line ${i}: not valid number`);
+					throw new Error(`rounds line ${i+1}: not valid number`);
 				for (let c = 0; c < count; c++)
 					rounds.push({
 						date: date,
 						zone: zone,
-						rank: c,
-						// TODO slots dictionary-> Done below. Every round has sport slots.
+						rank: c + 1,
+						slots: {},
 					});
 			});
-			for (let i =0; i<rounds.length; i++){
-				for (let k = 0; k < sports.length; k++){
-					rounds[i][sports[k].name]=[];
-				}
-			}
-			
-			console.log('rounds:\n' + rounds.map(round => `${round.date.toJSON().split('T')[0]} ${round.zone} ${round.rank}`).join('\n'));
+			// TODO constracti check rounds for duplicate dates
+			console.log('rounds: ' + rounds.length + '\n' + rounds.map(round => `${round.date.toJSON().split('T')[0]} ${round.zone.name} ${round.rank}`).join('\n'));
 
 			// produce slots
-			// TODO support courts -> Done. (i suppose)
-			const slots = rounds.map(round => {
-				return sports.map(sport => {
-					return sport.courts.map(court=>{
-						return {
-							round: round,
-							sport: sport,
-							court: court,
-							match: null,
-							available: true,
-						};
-					});
-				}).flat();
-			}).flat();
+			const slots = [];
+			rounds.forEach(round => {
+				courts.forEach(court => {
+					const slot = {
+						round: round,
+						court: court,
+						match: null,
+					};
+					round.slots[court.name] = slot;
+					slots.push(slot);
+				});
+			});
 			console.log('slots: ' + slots.length);
 
 			// produce matches
@@ -167,13 +178,18 @@ document.addEventListener('DOMContentLoaded', function() {
 				});
 			});
 			console.log('matches: ' + matches.length);
-			// TODO remove this statement and adapt following functions -> Done.
 
+			// TODO adapt scheduler and displayer to new data types
+
+			// TODO scheduler should accept only two arguments: slots and matches
 			ScheduleMatchesDefault(matches, rounds, slots, sports);
+
+			// TODO display as table
+			// TODO displayer should accept only three arguments: courts and slots - the first one is provided just for ordering purposes
 			Displayer(matches, rounds, slots, sports);
 
 		} catch (error) {
-			alert(error);
+			error.alert();
 		}
 	});
 });
