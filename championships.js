@@ -1,3 +1,5 @@
+const matches = [];
+
 function produce() {
 
 	// produce slots
@@ -15,43 +17,44 @@ function produce() {
 	});
 	console.log('slots: ' + slots.length);
 
-	// produce matches
-	const matches = [];
+	
 	
 	//produce matches from groups
 	Object.values(groups).forEach(gr => {
-		gr.teams.forEach(ta => {
-			if (th.id >= ta.id)
-				return;
-			matches.push({
-				sport: gr.sport,
-				slot: null,
-				team_home: th,
-				team_away: ta,
-				score_home: null,
-				score_away: null,
-				src: "group",
-				arg: gr,
+		gr.teams.forEach(th => {
+			gr.teams.forEach(ta => {
+				if (th.id >= ta.id)
+					return;
+				matches.push({
+					sport: gr.sport,
+					slot: null,
+					team_home: th,
+					team_away: ta,
+					score_home: null,
+					score_away: null,
+					src: "group",
+					arg: gr,
+				});
 			});
-			if (gr.has_revanche) {
-				gr.teams.forEach(th => {
-					gr.teams.forEach(ta => {
-						if (th.id >= ta.id)
-							return;
-						matches.push({
-							sport: gr.sport,
-							slot: null,
-							team_home: ta,
-							team_away: th,
-							score_home: null,
-							score_away: null,
-							src: "group",
-							arg: gr,
-						});
+		});
+		if (gr.has_revanche) {
+			gr.teams.forEach(th => {
+				gr.teams.forEach(ta => {
+					if (th.id >= ta.id)
+						return;
+					matches.push({
+						sport: gr.sport,
+						slot: null,
+						team_home: ta,
+						team_away: th,
+						score_home: null,
+						score_away: null,
+						src: "group",
+						arg: gr,
 					});
 				});
-			}
-		});
+			});
+		}
 	});
 
 	//no groups=knockout
