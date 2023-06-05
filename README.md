@@ -3,7 +3,7 @@ An HTML-JS application to plan championships.
 
 ## version
 
-0.2
+0.3
 
 ## configuration
 
@@ -75,7 +75,36 @@ Algorithm produces objects structured as documented below:
 /**
  * @typedef sport
  * @type {object}
- * @property {string} name - trimmed, unique, accepted values ["Ποδόσφαιρο", "Μπάσκετ"]
+ * @property {"Ποδόσφαιρο"|"Μπάσκετ"} name - trimmed, unique
+ * @property {court[]} courts
+ */
+```
+
+### group
+
+```js
+/**
+ * @typedef group
+ * @type {object}
+ * @property {string} id - trimmed, unique, non-empty
+ * @property {sport} sport
+ * @property {team[]} teams
+ * @property {boolean} has_revanche
+ */
+```
+
+### knockout
+
+```js
+/**
+ * @typedef knockout
+ * @type {object}
+ * @property {string} id - trimmed, unique, non-empty
+ * @property {sport} sport
+ * @property {string} home_src - trimmed, unique
+ * @property {team|int|boolean} home_arg
+ * @property {string} away_src - trimmed, unique
+ * @property {team|int|boolean} away_arg
  */
 ```
 
