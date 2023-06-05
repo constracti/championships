@@ -101,9 +101,9 @@ Algorithm produces objects structured as documented below:
  * @type {object}
  * @property {string} id - trimmed, unique, non-empty
  * @property {sport} sport
- * @property {string} home_src - trimmed, unique
+ * @property {?string} home_src - trimmed, unique
  * @property {team|int|boolean} home_arg
- * @property {string} away_src - trimmed, unique
+ * @property {?string} away_src - trimmed, unique
  * @property {team|int|boolean} away_arg
  */
 ```
