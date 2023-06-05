@@ -106,10 +106,49 @@ document.addEventListener('DOMContentLoaded', function() {
 						};
 						groups[group.id] = group;
 						break;
+					case 'knockouts':
+						const [knockout_id, knockout_sport, knockout_home, knockout_away] = line.split(/\s+/, 4);
+						const knockout_home_parts = knockout_home.split(':');
+						let knockout_home_src, knockout_home_arg;
+						if (knockout_home_parts.length === 1) {
+							knockout_home_src = null;
+							knockout_home_arg = teams[parseInt(knockout_home_parts[0]) - 1]; // TODO check for errors
+						} else if (knockout_home_parts[0] in groups) {
+							knockout_home_src = knockout_home_parts[0];
+							knockout_home_arg = parseInt(knockout_home_parts[1]); // TODO check for errors
+						} else if (knockout_home_parts[0] in knockouts) {
+							knockout_home_src = knockout_home_parts[0];
+							knockout_home_arg = knockout_home_parts[1].toLowerCase() === 'w';
+						} else {
+							throw new Error(`line ${i+1} knockouts: not valid`);
+						}
+						const knockout_away_parts = knockout_away.split(':');
+						let knockout_away_src, knockout_away_arg;
+						if (knockout_away_parts.length === 1) {
+							knockout_away_src = null;
+							knockout_away_arg = teams[parseInt(knockout_away_parts[0]) - 1]; // TODO check for errors
+						} else if (knockout_away_parts[0] in groups) {
+							knockout_away_src = knockout_away_parts[0];
+							knockout_away_arg = parseInt(knockout_away_parts[1]); // TODO check for errors
+						} else if (knockout_away_parts[0] in knockouts) {
+							knockout_away_src = knockout_away_parts[0];
+							knockout_away_arg = knockout_away_parts[1].toLowerCase() === 'w';
+						} else {
+							throw new Error(`line ${i+1} knockouts: not valid`);
+						}
+						const knockout = {
+							id: knockout_id.trim(),
+							sport: sports.filter(sport => sport.name === knockout_sport.trim())[0], // TODO check for error
+							home_src: knockout_home_parts.length > 1 ? knockout_home_parts[0] : null,
+							home_arg: knockout_home_parts.length > 1 ? knockout_home_parts[1] : parseInt(knockout_home_parts[0]),
+							away_src: knockout_away_parts.length > 1 ? knockout_away_parts[0] : null,
+							away_arg: knockout_away_parts.length > 1 ? knockout_away_parts[1] : parseInt(knockout_away_parts[0]),
+						};
+						knockouts[knockout.id] = knockout;
 				}
 			});
 
-			// TODO constracti check rounds for duplicate dates
+			// TODO check rounds for duplicate dates
 
 			produce();
 

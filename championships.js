@@ -69,14 +69,14 @@ function produce() {
 			//find group or knockout
 			Object.keys(groups).forEach(key => {
 				if (key===kn.home_src) {
-					team_home='${kn.home_src}${kn.home_arg}'
+					team_home=`${kn.home_src}${kn.home_arg}`
 					return team_home
 				}
 			});
 			if (!team_home) {
 				Object.keys(knockouts).forEach(key => {
 					if (key===kn.home_src) {
-						team_home='${kn.home_src}${kn.home_arg}'
+						team_home=`${kn.home_src}${kn.home_arg}`
 						return team_home
 					}
 				});
@@ -91,14 +91,14 @@ function produce() {
 			//find group or knockout
 			Object.keys(groups).forEach(key => {
 				if (key===kn.away_src) {
-					team_away='${kn.away_src}${kn.away_arg}'
+					team_away=`${kn.away_src}${kn.away_arg}`
 					return team_away
 				}
 			});
 			if (!team_away) {
 				Object.keys(knockouts).forEach(key => {
 					if (key===kn.away_src) {
-						team_away='${kn.away_src}${kn.away_arg}'
+						team_away=`${kn.away_src}${kn.away_arg}`
 						return team_away
 					}
 				});
@@ -113,7 +113,8 @@ function produce() {
 			score_home: null,
 			score_away: null,
 			src: "knockout",
-			arg: home_src,
+			arg: kn.home_src,
+			// TODO away
 		});
 	});
 	
