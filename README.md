@@ -3,69 +3,67 @@ An HTML-JS application to plan championships.
 
 ## version
 
-0.3
+0.4
 
 ## configuration
 
-A configuration JSON string is provided through a `textarea` element in the following format:
+A configuration string is provided through a `textarea` element in the following format:
 
-```json
-{
-  "teams": [
-    "Φωτοδότες",
-    "Αγωνιστές",
-    "Τροπαιοφόροι",
-    "Πρόμαχοι"
-  ],
-  "sports": [
-    "Ποδόσφαιρο: Π Ποδόσφαιρο, Κ Ποδόσφαιρο",
-    "Μπάσκετ"
-  ],
-  "zones": [
-    "Πρωί",
-    "Απόγευμα"
-  ],
-  "rounds": [
-    "2022-08-10 Απόγευμα 2",
-    "2022-08-11 Πρωί 2",
-    "2022-08-11 Απόγευμα 2",
-    "2022-08-12 Πρωί 2",
-    "2022-08-12 Απόγευμα 2",
-    "2022-08-13 Πρωί 2",
-    "2022-08-13 Απόγευμα 2",
-    "2022-08-16 Πρωί 2",
-    "2022-08-16 Απόγευμα 2",
-    "2022-08-17 Πρωί 2",
-    "2022-08-18 Πρωί 2",
-    "2022-08-19 Πρωί 2",
-    "2022-08-19 Απόγευμα 2",
-    "2022-08-20 Απόγευμα 2",
-    "2022-08-21 Απόγευμα 2"
-  ]
-}
+```ini
+[sports]
+Ποδόσφαιρο: Π Ποδόσφαιρο, Κ Ποδόσφαιρο
+Μπάσκετ
+
+[zones]
+Πρωί
+Απόγευμα
+
+[rounds]
+2023-08-10 Απόγευμα 2
+2023-08-11 Πρωί     2
+2023-08-11 Απόγευμα 2
+2023-08-12 Πρωί     2
+2023-08-13 Απόγευμα 2
+2023-08-14 Πρωί     2
+2023-08-15 Απόγευμα 2
+2023-08-16 Πρωί     2
+2023-08-16 Απόγευμα 2
+2023-08-17 Πρωί     2
+2023-08-18 Πρωί     2
+2023-08-18 Απόγευμα 2
+2023-08-19 Πρωί     2
+2023-08-19 Απόγευμα 2
+2023-08-21 Απόγευμα 2
+2023-08-22 Πρωί     2
+
+[teams]
+Φωτοδότες
+Αγωνιστές
+Πρόμαχοι
+Τροπαιοφόροι
+
+[groups]
+pg  Ποδόσφαιρο 6: 1-4
+kg  Μπάσκετ    3: 1-5
+
+[knockouts]
+p-s1 Ποδόσφαιρο   pg:1   pg:4
+p-s2 Ποδόσφαιρο   pg:2   pg:3
+p-F  Ποδόσφαιρο p-s1:W p-s2:W
+p-f  Ποδόσφαιρο p-s1:L p-s2:L
+k-F  Μπάσκετ      kg:1   kg:2
 ```
 
 ## datatypes
 
 Algorithm produces objects structured as documented below:
 
-### team
-
-```js
-/**
- * @typedef team
- * @type {object}
- * @property {number} id - positive integer
- * @property {string} name - trimmed, unique, non-empty
- */
-```
-
 ### court
 
 ```js
 /**
  * @typedef court
- * @type {string} - trimmed, unique
+ * @type {string} - trimmed words, unique, non-empty
  */
 ```
 
@@ -75,36 +73,8 @@ Algorithm produces objects structured as documented below:
 /**
  * @typedef sport
  * @type {object}
- * @property {"Ποδόσφαιρο"|"Μπάσκετ"} name - trimmed, unique
+ * @property {string} name - trimmed word, unique, non-empty
  * @property {court[]} courts
- */
-```
-
-### group
-
-```js
-/**
- * @typedef group
- * @type {object}
- * @property {string} id - trimmed, unique, non-empty
- * @property {sport} sport
- * @property {team[]} teams
- * @property {boolean} has_revanche
- */
-```
-
-### knockout
-
-```js
-/**
- * @typedef knockout
- * @type {object}
- * @property {string} id - trimmed, unique, non-empty
- * @property {sport} sport
- * @property {?string} home_src - trimmed, unique
- * @property {team|int|boolean} home_arg
- * @property {?string} away_src - trimmed, unique
- * @property {team|int|boolean} away_arg
  */
 ```
 
@@ -115,7 +85,7 @@ Algorithm produces objects structured as documented below:
  * @typedef zone
  * @type {object}
  * @property {number} rank - integer used for ordering
- * @property {string} name - trimmed, unique, non-empty
+ * @property {string} name - trimmed word, unique, non-empty
  */
 ```
 
@@ -129,6 +99,58 @@ Algorithm produces objects structured as documented below:
  * @property {zone} zone
  * @property {number} rank - positive integer used for ordering
  * @property {Object.<court, slot>} slots
+ */
+```
+
+### team
+
+```js
+/**
+ * @typedef team
+ * @type {object}
+ * @property {number} id - positive integer
+ * @property {string} name - trimmed words, unique, non-empty
+ */
+```
+
+### group
+
+```js
+/**
+ * @typedef group
+ * @type {object}
+ * @property {string} id - trimmed word, unique, non-empty
+ * @property {sport} sport
+ * @property {int} team_matches - matches per team
+ * @property {team[]} teams
+ */
+```
+
+### knockout
+
+```js
+/**
+ * @typedef knockout
+ * @type {object}
+ * @property {string} id - trimmed word, unique, non-empty
+ * @property {sport} sport - trimmed word, non-empty
+ * @property {knunion} home
+ * @property {knunion} away
+ */
+```
+
+### knunion
+
+```js
+/**
+ * @typedef knunion
+ * @type {object}
+ * @property {string} type
+ * @property {?team} team - if type === 'fixed'
+ * @property {?group} group - if type === 'group'
+ * @property {?int} rank - if type === 'group'
+ * @property {?knockout} knockout - if type === 'knockout'
+ * @property {?boolean} is_winner - if type === 'knockout'
  */
 ```
 

@@ -1,5 +1,5 @@
 Error.prototype.alert = function() {
-	alert(`${this.fileName}:${this.lineNumber}:${this.columnNumber} ${this.toString()}`);
+	alert(`${this.fileName}:${this.lineNumber}:${this.columnNumber}\n${this.toString()}`);
 };
 
 const points_fn_obj = {
@@ -19,4 +19,6 @@ const points_fn_obj = {
 		else
 			throw 'ισοπαλία στο μπάσκετ;';
 	},
+	'Βόλεϊ': (sh, sa) => sh - sa, // TODO fix volley fn
+	'Μπέιζμπολ': (sh, sa) => sh - sa, // TODO fix baseball fn
 };
