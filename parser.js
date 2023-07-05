@@ -1,3 +1,4 @@
+
 const courts = [];
 const sports = [];
 const zones = [];
@@ -5,6 +6,7 @@ const rounds = [];
 const teams = [];
 const groups = {};
 const knockouts = {};
+
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -128,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
 								zone: zone,
 								rank: c + 1,
 								slots: {},
+								count: count, //sorry i need this so bad! Maybe its not its place here but it will do for now...
 							});
 						break;
 					case 'teams':

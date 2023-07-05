@@ -1,4 +1,4 @@
-function Displayer(matches, rounds, slots, sports, groups){//other parameters are not used right now but in the future they might be
+function Displayer(slots){
 	let title = document.createElement("div");
 	let titleSpan = document.createElement("span");
 	titleSpan.innerHTML = "<h2>Schedule<h2>";
@@ -14,11 +14,22 @@ function Displayer(matches, rounds, slots, sports, groups){//other parameters ar
 			match.className = "match";
 			let slot = document.createElement("div");
 			let slotSpan = document.createElement("span");
-			slotSpan.innerHTML = `<b>Match:</b> ${m} <b>Date:</b> ${slots[i].round.date.toJSON().split('T')[0]}, <b>Zone:</b> ${slots[i].round.zone} ${slots[i].round.rank}, <b>Sport:</b> ${slots[i].sport.name}, <b>Court:</b> ${slots[i].court} |  ` ;
+			slotSpan.innerHTML = `<b>Match:</b> ${m} <b>Id:</b> ${slots[i].match.id} <b>Date:</b> ${slots[i].round.date.toJSON().split('T')[0]}, <b>Zone:</b> ${slots[i].round.zone.name} ${slots[i].round.rank}, <b>Sport:</b> ${slots[i].match.sport.name}, <b>Court:</b> ${slots[i].court} |  ` ;
 
 			let team1 = document.createElement("div");
 			let team1Span = document.createElement("span");
-			team1Span.innerHTML = slots[i].match.team_home.name;
+			if (typeof (slots[i].match.team_home.name) !== 'undefined'){
+				team1Span.innerHTML = slots[i].match.team_home.name;
+			}
+			else if (slots[i].match.team_home.type === 'fixed'){
+				team1Span.innerHTML = slots[i].match.team_home.team.name;
+			}
+			else if (slots[i].match.team_home.type === 'group'){
+				team1Span.innerHTML = `${slots[i].match.team_home.group.id}, rank: ${slots[i].match.team_home.rank}`;
+			}
+			else {
+				team1Span.innerHTML = `${slots[i].match.team_home.knockout.id},  ${slots[i].match.team_home.is_winner ? 'W' : 'L'}`;
+			}
 			let score1 = document.createElement("div");
 			let score1Input = document.createElement("input");
 			score1Input.type = "number";
@@ -37,7 +48,18 @@ function Displayer(matches, rounds, slots, sports, groups){//other parameters ar
 
 			let team2 = document.createElement("div");
 			let team2Span = document.createElement("span");
-			team2Span.innerHTML = slots[i].match.team_away.name;
+			if (typeof (slots[i].match.team_away.name) !== 'undefined'){
+				team2Span.innerHTML = slots[i].match.team_away.name;
+			}
+			else if (slots[i].match.team_away.type === 'fixed'){
+				team2Span.innerHTML = slots[i].match.team_away.team.name;
+			}
+			else if (slots[i].match.team_away.type === 'group'){
+				team2Span.innerHTML = `${slots[i].match.team_away.group.id}, rank: ${slots[i].match.team_away.rank}`;
+			}
+			else {
+				team2Span.innerHTML = `${slots[i].match.team_away.knockout.id},  ${slots[i].match.team_away.is_winner ? 'W' : 'L'}`;
+			}
 
 			slot.appendChild(slotSpan);
 			team1.appendChild(team1Span);
