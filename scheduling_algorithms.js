@@ -134,7 +134,7 @@ function ScheduleMatchesDefault(matches,rounds){
 						}
 
 
-						let threshold=0;
+						let threshold=-0.5;
 						if (matches[m].points >= threshold && scheduled === false){
 							for (let ma=0; ma<matches.length; ma++){
 								if (typeof matches[ma].team_home.name !== 'undefined' && matches[ma].team_away.name !== 'undefined'){
