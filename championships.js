@@ -1,7 +1,12 @@
 let matches = [];
+let crts = {};
+
 function deepCopy(obj){//simple deepCopy recursive function
 	if (typeof obj !== 'object' || obj === null){
 		return obj;
+	}
+	if (obj instanceof Date){
+		return new Date(obj);
 	}
 	let copy;
 	if (Array.isArray(obj)){
@@ -45,7 +50,6 @@ function pair_teams(remaining_games,group,matches){
 						newMatches.push({
 							id: group.id,
 							sport: group.sport,
-							slot: null,
 							team_home: th,
 							team_away: ta,
 							score_home: null,
@@ -69,12 +73,18 @@ function pair_teams(remaining_games,group,matches){
 
 function produce() {
 
+	// produce courts {}
+
+	courts.forEach(court => {
+		crts[court] = 0;
+	});
+
 	// produce slots
 	const slots = [];
 	rounds.forEach(round => {
 		courts.forEach(court => {
 			const slot = {
-				round: round,
+				//round: round,//this may not be needed (recursive reasons)
 				court: court,
 				match: null,
 			};
@@ -102,7 +112,7 @@ function produce() {
 						matches.push({
 							id: gr.id,
 							sport: gr.sport,
-							slot: null,
+							//slot: null, finally no need for this!
 							team_home: th,
 							team_away: ta,
 							score_home: null,
@@ -116,7 +126,7 @@ function produce() {
 		else{//if teams do not play all games against each other but only specific amount of them in a group < all the possible games against all teams once.
 			try{
 				if (gr.team_matches * gr.teams.length % 2 === 0){
-					remaining_games = {};
+					let remaining_games = {};
 					gr.teams.forEach(t => {
 						remaining_games[t.name] = gr.team_matches;
 					});
@@ -137,7 +147,6 @@ function produce() {
 		matches.push({
 			id: kn.id,
 			sport: kn.sport,
-			slot: null,
 			team_home: kn.home,
 			team_away: kn.away,
 			score_home: null,
@@ -152,8 +161,8 @@ function produce() {
 
 	// TODO adapt scheduler and displayer to new data types -> Done.
 
-	// TODO scheduler should accept only two arguments: slots and matches -> Done. i need rounds because they change (round.slot)
-	let program=ScheduleMatchesDefault(matches, rounds, slots);
+	// TODO scheduler should accept only two arguments: slots and matches -> Done. i need rounds instead of slots
+	let program=ScheduleMatchesDefault(matches, rounds);
 	console.log(program);
 
 	// TODO display as table
