@@ -34,7 +34,6 @@ function ScheduleMatchesDefault(matches,rounds){
 		return rounds;
 	}
 	else{
-		//console.log(matches,slots,rounds);
 		
 		matches.sort((a, b) => b.points - a.points);
 		crts = Object.fromEntries(
@@ -93,7 +92,6 @@ function ScheduleMatchesDefault(matches,rounds){
 									matches[ma].points=0;
 								}		
 							}
-							//console.log('allagi');
 							for (let rnd=r; rnd>r-rounds[r].count; rnd--){
 								if (rnd<0 || r === 0){
 									break;
@@ -134,7 +132,7 @@ function ScheduleMatchesDefault(matches,rounds){
 						}
 
 
-						let threshold=-0.5;
+						let threshold=0;
 						if (matches[m].points >= threshold && scheduled === false){
 							for (let ma=0; ma<matches.length; ma++){
 								if (typeof matches[ma].team_home.name !== 'undefined' && matches[ma].team_away.name !== 'undefined'){
@@ -175,7 +173,7 @@ function ScheduleMatchesDefault(matches,rounds){
 							let group_finished = true;
 							
 							for (let mg=0; mg<matches.length; mg++){
-								if (typeof (matches[mg].team_home.name) !== 'undefined' && typeof (matches[mg].team_away.name) !== 'undefined' ){//if one of the groups is not finished yet
+								if (typeof (matches[mg].team_home.name) !== 'undefined' && typeof (matches[mg].team_away.name) !== 'undefined' && matches[mg].sport.name === matches[m].sport.name){//if one of the groups (same sport) is not finished yet
 									group_finished = false;
 									break;
 								}
@@ -187,11 +185,14 @@ function ScheduleMatchesDefault(matches,rounds){
 								for (let rdate = r; rdate < rounds.length; rdate++){
 									for (let sdate of Object.keys(rounds[rdate].slots)){
 										if (rounds[rdate].slots[sdate].match !== null){
-											if (typeof (rounds[rdate].slots[sdate].match.team_home.name) !== 'undefined' && typeof (rounds[rdate].slots[sdate].match.team_away.name) !== 'undefined'){
+											if (typeof (rounds[rdate].slots[sdate].match.team_home.name) !== 'undefined' && typeof (rounds[rdate].slots[sdate].match.team_away.name) !== 'undefined' && rounds[rdate].slots[sdate].match.sport.name === matches[m].sport.name){
 												too_early = true;
 												break;
 											}	
 										}
+									}
+									if(too_early){
+										break;
 									}
 								}
 								for (let rdate = r; rdate >= 0; rdate--){
@@ -199,10 +200,12 @@ function ScheduleMatchesDefault(matches,rounds){
 										if (rounds[rdate].slots[sdate].match !== null){
 											if (rounds[rdate].slots[sdate].match.team_home.type === 'knockout' || rounds[rdate].slots[sdate].match.team_away.type === 'knockout'){
 												too_late = true;//this is a group type kn game indicating that is less special than a knockout type kn game, thus it must be placed earlier
-												//console.log(slots[date].match.id);
 												break;
 											}
 										}
+									}
+									if(too_late){
+										break;
 									}
 								}
 								//console.log('te', too_early,'tl', too_late);
@@ -302,6 +305,9 @@ function ScheduleMatchesDefault(matches,rounds){
 											}
 										}
 									}
+									if (too_early){
+										break;
+									}
 								}
 								//console.log('te',too_early);
 								if (!too_early){
@@ -347,6 +353,43 @@ function ScheduleMatchesDefault(matches,rounds){
 											
 									}
 								}
+							}
+						}
+						else if(matches[m].team_home.type === 'fixed' && matches[m].team_away.type === 'fixed'){
+							team1_k=matches[m].team_home.team.name;
+							team2_k=matches[m].team_away.team.name;
+						
+							let used_slots=0;
+							for (let sl=0; sl < Object.keys(rounds[r].slots).length; sl++){
+								if (Object.values(rounds[r].slots)[sl].match !== null){
+									used_slots+=1;
+								}
+							}
+							for (let sl=0; sl < Object.keys(rounds[r].slots).length; sl++){//for every slot in this round
+								if (Object.values(rounds[r].slots)[sl].match !== null){//if this slot has an active match
+									if (Object.values(rounds[r].slots)[sl].match.team_home.name === team1_k || Object.values(rounds[r].slots)[sl].match.team_away.name === team1_k || Object.values(rounds[r].slots)[sl].match.team_home.name === team2_k || Object.values(rounds[r].slots)[sl].match.team_away.name === team2_k){
+										scheduled_k = true;
+										break;
+									}
+								}
+								if (used_slots * 2 >= teams.length - 1){ //only 1 or 0 teams available = cannot produce a match in that round
+									scheduled_k = true;
+									break;
+								}
+							}
+							//console.log('sk',scheduled_k);
+							if (!scheduled_k){
+								let newrounds=deepCopy(rounds);
+								
+								newrounds[r].slots[s].match=matches[m];
+								let newMatches = matches.filter((element) => element !== matches[m]);
+								result=ScheduleMatchesDefault(newMatches,newrounds);
+	
+								if (result)
+								{
+									return result;
+								}
+									
 							}
 						}
 					}

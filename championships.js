@@ -32,10 +32,13 @@ function pair_teams(remaining_games,group,matches){
 		return matches;
 	}
 	else {
+		//debugger;
 		for (let i=0; i<group.teams.length; i++){
-			for (let j=i; j<group.teams.length; j++){
-				th=group.teams[i];
-				ta=group.teams[j];
+			let gr_teams=[...group.teams];
+			while(gr_teams.length>0 && !Object.values(remaining_games).every(value => value === 0)){
+				randomj = Math.floor(Math.random() * gr_teams.length);
+				let ta=gr_teams[randomj];
+				let th=group.teams[i];
 				if (remaining_games[ta.name] > 0 && remaining_games[th.name] > 0){
 					let scheduled = false;
 					matches.forEach(m => {
@@ -59,12 +62,14 @@ function pair_teams(remaining_games,group,matches){
 						let new_rem = {...remaining_games};
 						new_rem[th.name]-=1;
 						new_rem[ta.name]-=1;
+						console.log('hi');
 						result=pair_teams(new_rem,group,newMatches);
 						if (result){
 							return result;
 						}
 					}
 				}
+				gr_teams = gr_teams.filter((element) => element.name !== ta.name);
 			}
 		}
 	}
@@ -129,6 +134,7 @@ function produce() {
 					let remaining_games = {};
 					gr.teams.forEach(t => {
 						remaining_games[t.name] = gr.team_matches;
+						console.log(remaining_games,gr);
 					});
 					matches=pair_teams(remaining_games,gr,matches);
 				}
