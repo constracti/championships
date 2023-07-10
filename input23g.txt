@@ -74,7 +74,7 @@ pf  Ποδόσφαιρο ps1:W ps2:W
 
 ks1 Μπάσκετ    kg1:1 kg2:2
 ks2 Μπάσκετ    kg2:1 kg1:2
-kf  Μπάσκετ     kg:1  kg:2
+kf  Μπάσκετ    ks1:W ks2:W
 
 vs1 Βόλεϊ      vg1:1 vg2:2
 vs2 Βόλεϊ      vg2:1 vg1:2
