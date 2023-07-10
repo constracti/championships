@@ -183,6 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
 								group_teams.push(t);
 							});
 						});
+						if (group_team_matches % 2 === 1 && group_teams.length % 2 === 1)
+							throw new Error(`config ${i+1}: not acceptable group team matches`);
 						const group = {
 							id: group_id,
 							sport: group_sport,
