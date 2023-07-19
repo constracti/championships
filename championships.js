@@ -76,6 +76,7 @@ function pair_teams(remaining_games,group,matches){
 }
 
 
+// TODO what happens when produced is called multiple times?
 function produce() {
 
 	// produce courts {}
@@ -165,22 +166,16 @@ function produce() {
 
 	console.log('matches: ' + matches.length);
 
-	// TODO adapt scheduler and displayer to new data types -> Done.
-
 	// TODO scheduler should accept only two arguments: slots and matches -> Done. i need rounds instead of slots
-	let program=ScheduleMatchesDefault(matches, rounds);
+	let program = ScheduleMatchesDefault(matches, rounds);
 	console.log(program);
 
-	// TODO display as table
-	// TODO displayer should accept only three arguments: courts and slots - the first one is provided just for ordering purposes -> Done, no need for courts.
-	try{
+	try {
 		if (program)
-		Displayer(program);
-		else{
+			displayer(program);
+		else
 			throw new Error(`cannot produce the program with those parameters`);
-		}
-	}
-	catch(error){
+	} catch (error) {
 		error.alert(); 
 	}
 }

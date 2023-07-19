@@ -3,7 +3,7 @@ An HTML-JS application to plan championships.
 
 ## version
 
-0.4
+1.0
 
 ## configuration
 
