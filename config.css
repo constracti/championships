@@ -1,0 +1,4 @@
+textarea[name="config"] {
+	box-sizing: border-box;
+	width: 100%;
+}
