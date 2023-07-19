@@ -1,4 +1,6 @@
 function displayer(program) {
+
+	// collect columns
 	const col_str = (sport, court) => `${sport.name}: ${court}`;
 	const col_dict = {};
 	const col_list = [];
@@ -12,7 +14,8 @@ function displayer(program) {
 			});
 		});
 	});
-	//console.log(col_list);
+
+	// organize rounds
 	// TODO constracti day list as global from parser; change round input format
 	const dayobj_dict = {};
 	const dayobj_list = [];
@@ -39,6 +42,8 @@ function displayer(program) {
 			})),
 		});
 	});
+
+	// attach matches
 	program.forEach(round => {
 		const dayobj_json = round.date.toJSON().slice(0, 10);
 		const dayobj = dayobj_list[dayobj_dict[dayobj_json]];
@@ -52,7 +57,8 @@ function displayer(program) {
 			colobj.match = slot.match;
 		});
 	});
-	//console.log(dayobj_list);
+
+	// create html
 	const home = document.createElement('div');
 	home.classList.add('day-list');
 	document.body.appendChild(home);
@@ -73,6 +79,8 @@ function displayer(program) {
 		zone_ul.classList.add('zone-list');
 		day_div.appendChild(zone_ul);
 		dayobj.zoneobj_list.forEach(zoneobj => {
+			if (zoneobj.roundobj_list.length === 0)
+				return;
 			const zone_li = document.createElement('div');
 			zone_li.classList.add('zone');
 			zone_ul.appendChild(zone_li);
@@ -107,4 +115,5 @@ function displayer(program) {
 			});
 		});
 	});
+
 }
