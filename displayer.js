@@ -84,10 +84,12 @@ function displayer(program) {
 			const zone_li = document.createElement('div');
 			zone_li.classList.add('zone');
 			zone_ul.appendChild(zone_li);
-			const zone_h = document.createElement('div');
-			zone_h.classList.add('zone-name');
-			zone_li.appendChild(zone_h);
-			zone_h.innerHTML = zoneobj.zone.name;
+			if (zones.length !== 1 || zones[0].name !== null) {
+				const zone_h = document.createElement('div');
+				zone_h.classList.add('zone-name');
+				zone_li.appendChild(zone_h);
+				zone_h.innerHTML = zoneobj.zone.name;
+			}
 			const round_ul = document.createElement('div');
 			round_ul.classList.add('round-list');
 			zone_li.appendChild(round_ul);

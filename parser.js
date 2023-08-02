@@ -99,6 +99,8 @@ document.addEventListener('DOMContentLoaded', () => {
 						});
 						break;
 					case 'zones':
+						if (rounds.length > 0)
+							throw new Error(`config ${i+1}: zone declaration after round`);
 						const zone_matchobj = str.match(/^\s*([^\s:,]+)\s*$/);
 						if (zone_matchobj === null)
 							throw new Error(`config ${i+1}: not valid zone`);
@@ -111,26 +113,31 @@ document.addEventListener('DOMContentLoaded', () => {
 						});
 						break;
 					case 'rounds':
-						const round_matchobj = str.match(/^\s*(\d{4}-\d{2}-\d{2})\s+([^\s:,]+)\s+(\d+)\s*$/);
+						if (zones.length === 0)
+							zones.push({
+								rank: 0,
+								name: null,
+							});
+						const round_matchobj = str.match(/^\s*(\d{4}-\d{2}-\d{2})\s+(\d+(?:\s+\d+)*)\s*$/);
 						if (round_matchobj === null)
 							throw new Error(`config ${i+1}: not valid round`);
 						const date = new Date(round_matchobj[1]);
 						if (Number.isNaN(date.getFullYear()))
 							throw new Error(`config ${i+1}: not valid round date`);
-						const zone = zones.filter(zone => zone.name === round_matchobj[2])[0];
-						if (zone === undefined)
-							throw new Error(`config ${i+1}: not valid round zone`);
-						const count = parseInt(round_matchobj[3]);
-						if (count < 0)
-							throw new Error(`config ${i+1}: not valid round count`);
-						for (let c = 0; c < count; c++)
-							rounds.push({
-								date: date,
-								zone: zone,
-								rank: c + 1,
-								slots: {},
-								count: count, //sorry i need this so bad! Maybe its not its place here but it will do for now...
-							});
+						const round_zones = round_matchobj[2].split(/\s+/);
+						if (round_zones.length !== zones.length)
+							throw new Error(`config ${i+1}: not valid round zones`);
+						round_zones.forEach((count, zone) => {
+							count = parseInt(count);
+							for (let c = 0; c < count; c++)
+								rounds.push({
+									date: date,
+									zone: zones[zone],
+									rank: c + 1,
+									slots: {},
+									count: count, //sorry i need this so bad! Maybe its not its place here but it will do for now...
+								});
+						});
 						break;
 					case 'teams':
 						const team_matchobj = str.match(/^([^:,]*)$/);
