@@ -32,8 +32,42 @@ function deepCopyObj(obj) {//for deep copy without recursion (because js had eno
 
 //Here is the scheduling for default structure. It is a recursive function that every time a match is placed in a slot, it calls itself after it pops the match, to schedule the next one until all matches are placed in a slot.
 function ScheduleMatchesDefault(matches,rounds){
+	let arr=[];
+	let incomplete=0;
 	if (matches.length === 0){
-		return rounds;
+		for (let r = 0; r < rounds.length; r++){//for every round
+			arr=[];
+			for (let rnd = r; rnd < r+rounds[r].count; rnd++){
+				if (rnd>=rounds.length){
+					break;
+				}
+				if (rounds[rnd].date.getDate()===rounds[r].date.getDate() && rounds[rnd].zone.rank === rounds[r].zone.rank){
+					for(let sl=0; sl < Object.keys(rounds[rnd].slots).length; sl++){
+						if (Object.values(rounds[rnd].slots)[sl].match!==null){
+							if (typeof (Object.values(rounds[rnd].slots)[sl].match.team_home.name)!== 'undefined' && typeof (Object.values(rounds[rnd].slots)[sl].match.team_away.name)!== 'undefined'){
+								if (!arr.includes(Object.values(rounds[rnd].slots)[sl].match.team_home.name)){
+									arr.push(Object.values(rounds[rnd].slots)[sl].match.team_home.name);
+								}
+								if (!arr.includes(Object.values(rounds[rnd].slots)[sl].match.team_away.name)){
+									arr.push(Object.values(rounds[rnd].slots)[sl].match.team_away.name);
+								}
+							}	
+						}	
+					}
+				}
+			}
+			if (arr.length!=teams.length){
+				incomplete+=1;
+			}
+		}
+		if (incomplete<=rounds.length-9){
+			return rounds;
+		}
+		else{
+			console.log('incomplete',incomplete);
+			return false;
+		}
+		
 	}
 	else{
 		
@@ -48,7 +82,7 @@ function ScheduleMatchesDefault(matches,rounds){
 				for (let m = 0; m < matches.length; m++){
 					//RULES
 					//if this slot is available and the court corresponds to the sport of the match and its not a knockout (1)
-					//console.log(r,rounds[r].slots[s],matches[m].id,matches[m].team_home.name,matches[m].team_away.name,matches[m].points,rounds[r].date,rounds[r].rank,rounds[r].zone);
+					//console.log(r,rounds[r].slots[s],matches[m].id,matches[m].team_home.name,matches[m].team_away.name,matches[m].points,matches[m].sequence,rounds[r].date,rounds[r].rank,rounds[r].zone);
 					if (rounds[r].slots[s].match === null && matches[m].sport.courts.includes(rounds[r].slots[s].court) && typeof (matches[m].team_home.name) !== 'undefined' && typeof (matches[m].team_away.name) !== 'undefined'){
 						let team1 = matches[m].team_home.name;
 						let team2 = matches[m].team_away.name;
@@ -75,7 +109,7 @@ function ScheduleMatchesDefault(matches,rounds){
 									}
 							}
 						}
-						too_late=false;
+						let too_late=false;
 						for (let date=s; date>=0; date--){
 							if (slots[date].match !== null){
 								if (typeof (slots[date].match.team_home.name) === 'undefined' && typeof (slots[date].match.team_away.name) === 'undefined'){
@@ -84,48 +118,169 @@ function ScheduleMatchesDefault(matches,rounds){
 								}
 							}
 						}
+						let too_early=false;
+						let gr_id=matches[m].id;
+						for (let ma=0; ma<matches.length; ma++){
+							if (matches[ma].id === gr_id){
+								if (groups[gr_id].team_matches % (groups[gr_id].teams.length-1) === 0 &&  groups[gr_id].team_matches / (groups[gr_id].teams.length-1) !== 1){
+									if (matches[m].sequence>matches[ma].sequence){
+										too_early = true;//if there is at least a not placed match of previous phase
+										//console.log('otinanai');
+										break;
+									}
+								}
+							}	
+						}
+
+						for (let rdate = r; rdate < rounds.length; rdate++){
+							for (let sdate of Object.keys(rounds[rdate].slots)){
+								if (rounds[rdate].slots[sdate].match !== null){
+									if (typeof (rounds[rdate].slots[sdate].match.team_home.name) !== 'undefined' && typeof (rounds[rdate].slots[sdate].match.team_away.name) !== 'undefined'){
+										if (rounds[rdate].slots[sdate].match.id === gr_id){
+											if (groups[gr_id].team_matches % (groups[gr_id].teams.length-1) === 0 &&  groups[gr_id].team_matches / (groups[gr_id].teams.length-1) !== 1){
+												if (matches[m].sequence>rounds[rdate].slots[sdate].match.sequence){
+													too_early = true;//if all first phase matches of a group are placed but we are trying to place a 2nd phase game before all 1st phase games are finished
+													break;
+												}
+											}
+										}
+									}	
+								}
+							}
+							if(too_early){
+								break;
+							}
+						}
+
+
+						
 						
 						
 						//rules for sorting the matches
 						//console.log('s',scheduled,'tl' ,too_late);
-						if (!scheduled && !too_late){
-							for (let ma=0; ma<matches.length; ma++){
+						if (!scheduled && !too_late && !too_early){
+							for (let ma=0; ma<matches.length; ma++){//maybe this will be deleted
 								if (matches[m].points<0){
-									matches[ma].points=0;
+									//matches[ma].points=0;
 								}		
 							}
-							for (let rnd=r; rnd>r-rounds[r].count; rnd--){
+							for (let rnd=r; rnd>r-rounds[r].count; rnd--){//for previous day
 								if (rnd<0 || r === 0){
 									break;
 								}
-								for (let sl of Object.keys(crts)){
-									//console.log(rnd,sl);
-									if (rounds[rnd].slots[sl].match !== null){
-										if (typeof rounds[rnd].slots[sl].match.team_home.name !== 'undefined' && rounds[rnd].slots[sl].match.team_away.name !== 'undefined'){
-											//console.log(team1,team2,rounds[rnd].slots[sl].match.team_home.name,rounds[rnd].slots[sl].match.team_away.name);
-											if ((team1 === rounds[rnd].slots[sl].match.team_home.name || team2 === rounds[rnd].slots[sl].match.team_home.name) && (team1 === rounds[rnd].slots[sl].match.team_away.name || team2 === rounds[rnd].slots[sl].match.team_away.name)){
-												
-												if (matches[m].sport.name === rounds[rnd].slots[sl].match.sport.name){
-													matches[m].points-=5;//we do not want the same pair of teams to play the same sport again next round if possible.
+								if (rounds[rnd].date.getDate()===rounds[r].date.getDate() && rounds[rnd].zone.rank === rounds[r].zone.rank){
+									//console.log(rnd);
+									for (let sl of Object.keys(crts)){
+										//console.log(rnd,sl);
+										if (rounds[rnd].slots[sl].match !== null){
+											if (typeof rounds[rnd].slots[sl].match.team_home.name !== 'undefined' && rounds[rnd].slots[sl].match.team_away.name !== 'undefined'){
+												//console.log(team1,team2,rounds[rnd].slots[sl].match.team_home.name,rounds[rnd].slots[sl].match.team_away.name);
+												if ((team1 === rounds[rnd].slots[sl].match.team_home.name || team2 === rounds[rnd].slots[sl].match.team_home.name) && (team1 === rounds[rnd].slots[sl].match.team_away.name || team2 === rounds[rnd].slots[sl].match.team_away.name)){
 													
+													if (matches[m].sport.name === rounds[rnd].slots[sl].match.sport.name){
+														scheduled=true;
+														//matches[m].points-=15;//we do not want the same pair of teams to play the same sport again next round if possible.
+														//console.log('points-1 because same pair same sport');
+														
+													}
+													else{
+														scheduled=true;
+														//matches[m].points-=12;//we do not want the same pair of teams to another sport again next round if possible.
+														//console.log('points-1 because same pair another sport');
+													}
+												}
+												else if(team1 === rounds[rnd].slots[sl].match.team_home.name || team2 === rounds[rnd].slots[sl].match.team_home.name || team1 === rounds[rnd].slots[sl].match.team_away.name || team2 === rounds[rnd].slots[sl].match.team_away.name){
+													if (matches[m].sport.name === rounds[rnd].slots[sl].match.sport.name && rounds[r].slots[s].court === rounds[rnd].slots[sl].court && matches[m].sport.courts.length > 1){
+														scheduled=true;
+														//matches[m].points-=11;//we do not want a team to play the same sport in the same court (if sport.courts > 1) again next round if possible.
+														//console.log('points-1 because same court in same sport');
+													}
+													else if (matches[m].sport.name === rounds[rnd].slots[sl].match.sport.name){
+														scheduled=true;
+														//matches[m].points-=15;//we do not want a team to play the same sport again next round if possible.
+														//console.log('points-10 because same sport');
+													}
+												}
+												if (matches[m].sport.name === rounds[rnd].slots[sl].match.sport.name){
+													//matches[m].points-=1;//we want all sports to be played simultaneously by a team.
+													//console.log('points-1 in same sport games');
 												}
 												else{
-													matches[m].points-=3;//we do not want the same pair of teams to another sport again next round if possible.
+													//matches[m].points+=0.5;//1/(sports.length-1);
+													//console.log('points+0.5 in different sport games');
 												}
 											}
-											else if(team1 === rounds[rnd].slots[sl].match.team_home.name || team2 === rounds[rnd].slots[sl].match.team_home.name || team1 === rounds[rnd].slots[sl].match.team_away.name || team2 === rounds[rnd].slots[sl].match.team_away.name){
-												if (matches[m].sport.name === rounds[rnd].slots[sl].match.sport.name && rounds[r].slots[s].court === rounds[rnd].slots[sl].court && matches[m].sport.courts.length > 1){
-													matches[m].points-=2;//we do not want a team to play the same sport in the same court (if sport.courts > 1) again next round if possible.
+										}
+									}
+								}
+							}
+							for (let rnd=r; rnd<r+rounds[r].count; rnd++){//for next round
+								if (rnd>=rounds.length){
+									break;
+								}
+								if (rounds[rnd].date.getDate()===rounds[r].date.getDate() && rounds[rnd].zone.rank === rounds[r].zone.rank){
+									//console.log(rnd);
+									for (let sl of Object.keys(crts)){
+										//console.log(rnd,sl);
+										if (rounds[rnd].slots[sl].match !== null){
+											if (typeof rounds[rnd].slots[sl].match.team_home.name !== 'undefined' && rounds[rnd].slots[sl].match.team_away.name !== 'undefined'){
+												//console.log(team1,team2,rounds[rnd].slots[sl].match.team_home.name,rounds[rnd].slots[sl].match.team_away.name);
+												if ((team1 === rounds[rnd].slots[sl].match.team_home.name || team2 === rounds[rnd].slots[sl].match.team_home.name) && (team1 === rounds[rnd].slots[sl].match.team_away.name || team2 === rounds[rnd].slots[sl].match.team_away.name)){
+													
+													if (matches[m].sport.name === rounds[rnd].slots[sl].match.sport.name){
+														scheduled=true;
+														//matches[m].points-=15;//we do not want the same pair of teams to play the same sport again next round if possible.
+														//console.log('points-1 because same pair same sport');
+														
+													}
+													else{
+														scheduled=true;
+														//matches[m].points-=12;//we do not want the same pair of teams to another sport again next round if possible.
+														//console.log('points-1 because same pair another sport');
+													}
 												}
-												else if (matches[m].sport.name === rounds[rnd].slots[sl].match.sport.name){
-													matches[m].points-=1;//we do not want a team to play the same sport again next round if possible.
+												else if(team1 === rounds[rnd].slots[sl].match.team_home.name || team2 === rounds[rnd].slots[sl].match.team_home.name || team1 === rounds[rnd].slots[sl].match.team_away.name || team2 === rounds[rnd].slots[sl].match.team_away.name){
+													if (matches[m].sport.name === rounds[rnd].slots[sl].match.sport.name && rounds[r].slots[s].court === rounds[rnd].slots[sl].court && matches[m].sport.courts.length > 1){
+														scheduled=true;
+														//matches[m].points-=11;//we do not want a team to play the same sport in the same court (if sport.courts > 1) again next round if possible.
+														//console.log('points-1 because same court in same sport');
+													}
+													else if (matches[m].sport.name === rounds[rnd].slots[sl].match.sport.name){
+														scheduled=true;
+														//matches[m].points-=15;//we do not want a team to play the same sport again next round if possible.
+														//console.log('points-10 because same sport');
+													}
+												}
+												if (matches[m].sport.name === rounds[rnd].slots[sl].match.sport.name){
+													//matches[m].points-=1;//we want all sports to be played simultaneously by a team.
+													//console.log('points-1 in same sport games');
+												}
+												else{
+													//matches[m].points+=0.5;//1/(sports.length-1);
+													//console.log('points+0.5 in different sport games');
 												}
 											}
-											if (matches[m].sport.name === rounds[rnd].slots[sl].match.sport.name){
-												matches[m].points-=0.5;//we want all sports to be played simultaneously by a team.
-											}
-											else{
-												matches[m].points+=0.5;
+										}
+									}
+								}
+							}
+							for (let rnd=r; rnd>=r-(zones.length*rounds[r].count); rnd--){//for the whole day
+								if (rnd<0 || r === 0){
+									break;
+								}
+								if (rounds[rnd].date.getDate()===rounds[r].date.getDate()){
+									for (let sl of Object.keys(crts)){
+										if (rounds[rnd].slots[sl].match !== null){
+											if (typeof rounds[rnd].slots[sl].match.team_home.name !== 'undefined' && rounds[rnd].slots[sl].match.team_away.name !== 'undefined'){
+												if ((team1 === rounds[rnd].slots[sl].match.team_home.name || team2 === rounds[rnd].slots[sl].match.team_home.name) && (team1 === rounds[rnd].slots[sl].match.team_away.name || team2 === rounds[rnd].slots[sl].match.team_away.name)){
+														
+													if (matches[m].sport.name === rounds[rnd].slots[sl].match.sport.name){
+														scheduled=true;
+														//matches[m].points-=14;//we do not want the same pair of teams to play the same sport again all day.
+														//console.log('points-14 because same pair same sport same day');
+														
+													}
+												}
 											}
 										}
 									}
@@ -133,16 +288,18 @@ function ScheduleMatchesDefault(matches,rounds){
 							}
 						}
 
-
+						//console.log('Points right now: ',matches[m].points);
 						let threshold=0;
-						if (matches[m].points >= threshold && scheduled === false){
-							for (let ma=0; ma<matches.length; ma++){
+						if (matches[m].points >= threshold && !scheduled && !too_late && !too_early){
+							for (let ma=0; ma<matches.length; ma++){//above points optimized for input23g
 								if (typeof matches[ma].team_home.name !== 'undefined' && matches[ma].team_away.name !== 'undefined'){
 									if ((matches[ma].team_home.name !== team1 && matches[ma].team_home.name !== team2) || (matches[ma].team_away.name !== team1 && matches[ma].team_away.name !== team2)){
-										matches[ma].points+=0.5;//this team must be placed higher because they did not play this round
+										matches[ma].points+=0.1;//this team must be placed higher because they did not play this round
+										//console.log(matches[ma],'points+0.5 because they did not played');
 									}
 									if (matches[ma].team_home.name === team1 || matches[ma].team_home.name === team2 || matches[ma].team_away.name === team1 || matches[ma].team_away.name === team2){
-										matches[ma].points-=1;//this team must be placed lower because they played this round
+										matches[ma].points-=3.5;//this team must be placed lower because they played this round
+										//console.log(matches[ma],'points-1 because they played');
 									}
 								}
 							}
@@ -158,7 +315,7 @@ function ScheduleMatchesDefault(matches,rounds){
 							let newrounds=deepCopy(rounds);
 							newrounds[r].slots[s].match=matches[m];
 							let newMatches = matches.filter((element) => element !== matches[m]);
-							
+							//console.log('Match: ',matches[m],' placed.',matches,crts);
 							
 							
 							result=ScheduleMatchesDefault(newMatches,newrounds);
@@ -167,6 +324,10 @@ function ScheduleMatchesDefault(matches,rounds){
 								return result;
 							}
 								
+						}
+						else if (matches[m].points < threshold){
+							matches[m].points=0;
+							//console.log('reset points');
 						}
 					}
 					else if (rounds[r].slots[s].match === null && matches[m].sport.courts.includes(rounds[r].slots[s].court) && typeof (matches[m].team_home.name) === 'undefined' && typeof (matches[m].team_away.name) === 'undefined'){

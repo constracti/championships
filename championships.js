@@ -111,12 +111,13 @@ function produce() {
 		let total_matches = (gr.team_matches * gr.teams.length)/2;
 		if (total_matches % ((gr.teams.length * (gr.teams.length - 1)) / 2) === 0){ //if the teams play against each other x times exactly. 
 			for (let i = 0; i < gr.team_matches/(gr.teams.length-1); i++){
-				gr.teams.forEach(th => {
+				gr.teams.forEach(th => {//TODO->away and home teams must be different in the next phase if phases >1 in a group.
 					gr.teams.forEach(ta => {
 						if (th.id >= ta.id)
 							return;
 						matches.push({
 							id: gr.id,
+							sequence: i, //i need this to schedule the >1 phases of a group correctly (the same match must be placed after )
 							sport: gr.sport,
 							//slot: null, finally no need for this!
 							team_home: th,
