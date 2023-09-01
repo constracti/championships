@@ -3,175 +3,143 @@ An HTML-JS application to plan championships.
 
 ## version
 
-1.1
+1.2
 
 ## configuration
 
-A configuration string is provided through a `textarea` element in the following format:
+A configuration string is provided through a `textarea` element.
 
-```ini
-[sports]
-Ποδόσφαιρο: Π Ποδόσφαιρο, Κ Ποδόσφαιρο
-Μπάσκετ
+A word in square brackets defines the type of the following lines.
 
-[zones]
-Πρωί
-Απόγευμα
+#### examples
 
-[rounds]
-2023-08-10 0 2
-2023-08-11 2 2
-2023-08-12 2 0
-2023-08-13 0 2
-2023-08-14 2 0
-2023-08-15 0 2
-2023-08-16 2 2
-2023-08-17 2 0
-2023-08-18 2 2
-2023-08-19 2 2
-2023-08-21 0 2
+`[sports]`
 
-[teams]
-Φωτοδότες
-Αγωνιστές
-Πρόμαχοι
-Τροπαιοφόροι
+`[teams]`
 
-[groups]
-pg  Ποδόσφαιρο 6: 1-4
-kg  Μπάσκετ    3: 1-4
+Full realistic examples are given in text files named `input*.txt`.
 
-[knockouts]
-p-s1 Ποδόσφαιρο   pg:1   pg:4
-p-s2 Ποδόσφαιρο   pg:2   pg:3
-p-F  Ποδόσφαιρο p-s1:W p-s2:W
-p-f  Ποδόσφαιρο p-s1:L p-s2:L
-k-F  Μπάσκετ      kg:1   kg:2
+Detailed syntax is explained in the subsections below.
+
+### sports
+
+A sport line contains the sport name (a single word), optionally followed by a court list definition.
+
+A court list definition consists of a colon (`:`) and a comma (`,`) separated list of courts.
+
+Sports with the same name are not allowed.
+
+If no court list definition is provided, a court named by the sport will be considered.
+
+#### examples
+
+`Soccer: Old Soccer Court, New Soccer Court`
+
+`Volleyball`
+
+`Baseball: Old Soccer Court`
+
+### zones
+
+A zone line contains the zone name.
+
+Zones are ranked according to their declaration order.
+
+If no zones are provided, a single zone will be considered. The zone name will be set to `null`.
+
+After a day line, zones can't be added.
+
+#### examples
+
+`Morning`
+
+`Afternoon`
+
+### days
+
+A day line contains a date (given in the format `YYYY-mm-dd`) and a list of integers indicating the number of rounds per zone.
+
+The length of the integer list should match the number of the zones.
+
+Days with the same date are not allowed.
+
+#### examples
+
+```
+2023-08-10 3
 ```
 
-## datatypes
-
-Algorithm produces objects structured as documented below:
-
-### court
-
-```js
-/**
- * @typedef court
- * @type {string} - trimmed words, unique, non-empty
- */
+```
+2023-08-10 1 2
+2023-08-11 2 0
 ```
 
-### sport
+### teams
 
-```js
-/**
- * @typedef sport
- * @type {object}
- * @property {string} name - trimmed word, unique, non-empty
- * @property {court[]} courts
- */
+A team line contains the team name.
+
+#### note
+
+Teams are numbered starting from `1`.
+
+### groups
+
+A group line contains the group code, the sport name, a positive integer indicating the number of matches each team will play and a collection of teams.
+
+The group code is a single word. Groups with the same code are not allowed.
+
+A collection of teams consists of a colon (`:`) and a comma (`,`) separated list of integers or integer ranges.
+
+An integer range is formed by two integers separated by a dash (`-`).
+
+In case the number of teams in the group is odd, the number of matches each team will play must be even.
+
+#### examples
+
+```
+sg  Soccer     8: 1-5
 ```
 
-### zone
-
-```js
-/**
- * @typedef zone
- * @type {object}
- * @property {number} rank - integer used for ordering
- * @property {string} name - trimmed word, unique, non-empty
- */
+```
+vg1 Volleyball 4: 1, 4-5, 7, 10
+vg2 Volleyball 4: 2-3, 6, 8-9
 ```
 
-### round
-
-```js
-/**
- * @typedef round
- * @type {object}
- * @property {Date} date
- * @property {zone} zone
- * @property {number} rank - positive integer used for ordering
- * @property {Object.<court, slot>} slots
- */
+```
+bg  Baseball   1: 2-5
 ```
 
-### team
+### knockouts
 
-```js
-/**
- * @typedef team
- * @type {object}
- * @property {number} id - positive integer
- * @property {string} name - trimmed words, unique, non-empty
- */
+A knockout line contains the knockout code, the sport name and two expressions describing the selection algorithm of each opponent.
+
+The knockout code is a single word. Knockouts with the same code are not allowed.
+
+An expression may take one of the following three forms:
+
++ a single integer: The team with this index is selected.
++ a group code and an integer separated by a color (`:`): The team with the corresponding ranking within the group is selected.
++ a knockout code and one of the uppercase letters `W` or `L`: Winner or loser of the corresponding knockout match is selected.
+
+#### examples
+
+```
+pf  Soccer    pg:1  pg:2
 ```
 
-### group
-
-```js
-/**
- * @typedef group
- * @type {object}
- * @property {string} id - trimmed word, unique, non-empty
- * @property {sport} sport
- * @property {int} team_matches - matches per team
- * @property {team[]} teams
- */
+```
+vq1 Volleyball vg1:1 vg2:4
+vq2 Volleyball vg1:2 vg2:3
+vq3 Volleyball vg1:3 vg2:2
+vq4 Volleyball vg1:4 vg2:1
+vs1 Volleyball vq1:W vq3:W
+vs2 Volleyball vq2:W vq4:W
+vfw Volleyball vs1:W vs2:W
+vfl Volleyball vs1:L vs2:L
 ```
 
-### knockout
-
-```js
-/**
- * @typedef knockout
- * @type {object}
- * @property {string} id - trimmed word, unique, non-empty
- * @property {sport} sport - trimmed word, non-empty
- * @property {knunion} home
- * @property {knunion} away
- */
 ```
-
-### knunion
-
-```js
-/**
- * @typedef knunion
- * @type {object}
- * @property {string} type
- * @property {?team} team - if type === 'fixed'
- * @property {?group} group - if type === 'group'
- * @property {?int} rank - if type === 'group'
- * @property {?knockout} knockout - if type === 'knockout'
- * @property {?boolean} is_winner - if type === 'knockout'
- */
-```
-
-### slot
-
-```js
-/**
- * @typedef slot
- * @type {object}
- * @property {round} round
- * @property {court} court
- * @property {?match} match
- */
-```
-
-### match
-
-```js
-/**
- * @typedef match
- * @type {object}
- * @property {sport} sport
- * @property {?slot} slot
- * @property {team} team_home
- * @property {team} team_away
- * @property {?number} score_home
- * @property {?number} score_away
- */
+bs1 Baseball       1  bg:2
+bs2 Baseball    bg:1  bg:3
+bf  Baseball   bs1:W bs2:W
 ```

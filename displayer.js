@@ -4,7 +4,7 @@ function displayer(program) {
 	const col_str = (sport, court) => `${sport.name}: ${court}`;
 	const col_dict = {};
 	const col_list = [];
-	sports.forEach(sport => {
+	config.sports.forEach(sport => {
 		sport.courts.forEach(court => {
 			col_key = col_str(sport, court);
 			col_dict[col_key] = col_list.length;
@@ -16,30 +16,31 @@ function displayer(program) {
 	});
 
 	// organize rounds
-	// TODO constracti day list as global from parser; change round input format
 	const dayobj_dict = {};
 	const dayobj_list = [];
-	rounds.forEach(round => {
-		const dayobj_json = round.date.toJSON().slice(0, 10);
-		if (!(dayobj_json in dayobj_dict)) {
-			dayobj_dict[dayobj_json] = dayobj_list.length;
-			dayobj_list.push({
-				date: round.date,
-				zoneobj_list: zones.map(zone => ({
-					zone: zone,
-					roundobj_list: [],
-				})),
-			});
-		}
-		const dayobj = dayobj_list[dayobj_dict[dayobj_json]];
-		const zoneobj = dayobj.zoneobj_list[round.zone.rank];
-		zoneobj.roundobj_list.push({
-			round: round,
-			colobj_list: col_list.map(col => ({
-				sport: col.sport,
-				court: col.court,
-				match: null,
+	config.days.forEach(day => {
+		const dayobj_json = day.date.toJSON().slice(0, 10);
+		dayobj_dict[dayobj_json] = dayobj_list.length;
+		dayobj_list.push({
+			date: day.date,
+			zoneobj_list: config.zones.map(zone => ({
+				zone: zone,
+				roundobj_list: [],
 			})),
+		});
+		const dayobj = dayobj_list[dayobj_dict[dayobj_json]];
+		day.dzones.forEach(dzone => {
+			const zoneobj = dayobj.zoneobj_list[dzone.zone.rank];
+			dzone.rounds.forEach(round => {
+				zoneobj.roundobj_list.push({
+					round: round,
+					colobj_list: col_list.map(col => ({
+						sport: col.sport,
+						court: col.court,
+						match: null,
+					})),
+				});
+			});
 		});
 	});
 
@@ -84,7 +85,7 @@ function displayer(program) {
 			const zone_li = document.createElement('div');
 			zone_li.classList.add('zone');
 			zone_ul.appendChild(zone_li);
-			if (zones.length !== 1 || zones[0].name !== null) {
+			if (config.zones.length !== 1 || config.zones[0].name !== null) {
 				const zone_h = document.createElement('div');
 				zone_h.classList.add('zone-name');
 				zone_li.appendChild(zone_h);

@@ -1,3 +1,6 @@
+// TODO run code using document.addEventListener('championships_config_parsed', () => {})
+// TODO scheduler should attach produced matches to an object formed as the config.days
+
 let matches = [];
 let crts = {};
 
@@ -145,7 +148,7 @@ function produce() {
 				}
 			}
 			catch(error){
-				error.alert(); 
+				alert(error.toString());
 			}
 		}
 	});
@@ -177,6 +180,6 @@ function produce() {
 		else
 			throw new Error(`cannot produce the program with those parameters`);
 	} catch (error) {
-		error.alert(); 
+		alert(error.toString());
 	}
 }
