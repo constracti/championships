@@ -1,5 +1,3 @@
-// TODO scheduler should attach produced matches to an object formed as the config.days
-
 let matches = [];
 let crts = {};
 
@@ -81,14 +79,10 @@ function pair_teams(remaining_games,group,matches){
 function produce() {
 
 	// produce court metric (to know which court has more games in a given time)
-
 	config.courts.forEach(court => {
 		crts[court] = 0;
 	});
-	
 
-	
-	
 	//produce matches from groups
 	Object.values(config.groups).forEach(gr => {
 		let total_matches = (gr.team_matches * gr.teams.length)/2;
@@ -145,27 +139,22 @@ function produce() {
 			points: 0,
 		});
 	});
-	
-
 
 	console.log('matches: ' + matches.length);
 	console.log(config.days);
 	let program = ScheduleMatchesDefault(matches, config.days);
 	console.log('finished',program);
-	global_program = program;
 
-	// TODO uncomment try catch block
-	//try {
+	try {
 		if (program)
-			displayer(program);
+			displayer(program); // IDEA save 'program' globally and trigger 'championships_program_ready'
 		else
 			throw new Error(`cannot produce the program with those parameters`);
-	//} catch (error) {
-	//	alert(error.toString());
-	//}
-}
+	} catch (error) {
+		alert(error.toString());
+	}
 
-let global_program = null;
+}
 
 document.addEventListener('championships_config_parsed', () => {
 	console.log('started');

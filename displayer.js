@@ -1,61 +1,13 @@
 function displayer(program) {
 
 	// collect columns
-	const col_str = (sport, court) => `${sport.name}: ${court}`;
-	const col_dict = {};
-	const col_list = [];
+	const cols = [];
 	config.sports.forEach(sport => {
 		sport.courts.forEach(court => {
-			col_key = col_str(sport, court);
-			col_dict[col_key] = col_list.length;
-			col_list.push({
+			cols.push({
 				sport: sport,
 				court: court,
 			});
-		});
-	});
-
-	// organize rounds
-	const dayobj_dict = {};
-	const dayobj_list = [];
-	config.days.forEach(day => {
-		const dayobj_json = day.date.toJSON().slice(0, 10);
-		dayobj_dict[dayobj_json] = dayobj_list.length;
-		dayobj_list.push({
-			date: day.date,
-			zoneobj_list: config.zones.map(zone => ({
-				zone: zone,
-				roundobj_list: [],
-			})),
-		});
-		const dayobj = dayobj_list[dayobj_dict[dayobj_json]];
-		day.dzones.forEach(dzone => {
-			const zoneobj = dayobj.zoneobj_list[dzone.zone.rank];
-			dzone.rounds.forEach(round => {
-				zoneobj.roundobj_list.push({
-					round: round,
-					colobj_list: col_list.map(col => ({
-						sport: col.sport,
-						court: col.court,
-						match: null,
-					})),
-				});
-			});
-		});
-	});
-
-	// attach matches
-	program.forEach(round => {
-		const dayobj_json = round.dzone.day.date.toJSON().slice(0, 10);
-		const dayobj = dayobj_list[dayobj_dict[dayobj_json]];
-		const zoneobj = dayobj.zoneobj_list[round.dzone.zone.rank];
-		const roundobj = zoneobj.roundobj_list[round.rank - 1];
-		Object.values(round.slots).forEach(slot => {
-			if (slot.match === null)
-				return;
-			const col_key = col_str(slot.match.sport, slot.court);
-			const colobj = roundobj.colobj_list[col_dict[col_key]];
-			colobj.match = slot.match;
 		});
 	});
 
@@ -63,14 +15,14 @@ function displayer(program) {
 	const home = document.createElement('div');
 	home.classList.add('day-list');
 	document.body.appendChild(home);
-	dayobj_list.forEach(dayobj => {
+	program.forEach(day => {
 		const day_div = document.createElement('div');
 		day_div.classList.add('day');
 		home.appendChild(day_div);
 		const day_h = document.createElement('div');
 		day_h.classList.add('day-date');
 		day_div.appendChild(day_h);
-		day_h.innerHTML = dayobj.date.toLocaleDateString('el', {
+		day_h.innerHTML = day.date.toLocaleDateString('el', {
 			weekday: 'long',
 			day: '2-digit',
 			month: 'long',
@@ -79,8 +31,8 @@ function displayer(program) {
 		const zone_ul = document.createElement('div');
 		zone_ul.classList.add('zone-list');
 		day_div.appendChild(zone_ul);
-		dayobj.zoneobj_list.forEach(zoneobj => {
-			if (zoneobj.roundobj_list.length === 0)
+		day.dzones.forEach(dzone => {
+			if (dzone.rounds.length === 0)
 				return;
 			const zone_li = document.createElement('div');
 			zone_li.classList.add('zone');
@@ -89,24 +41,25 @@ function displayer(program) {
 				const zone_h = document.createElement('div');
 				zone_h.classList.add('zone-name');
 				zone_li.appendChild(zone_h);
-				zone_h.innerHTML = zoneobj.zone.name;
+				zone_h.innerHTML = dzone.zone.name;
 			}
 			const round_ul = document.createElement('div');
 			round_ul.classList.add('round-list');
 			zone_li.appendChild(round_ul);
-			zoneobj.roundobj_list.forEach(roundobj => {
+			dzone.rounds.forEach(round => {
 				const round_li = document.createElement('div');
 				round_li.classList.add('round');
 				round_ul.appendChild(round_li);
 				const col_ul = document.createElement('div');
 				col_ul.classList.add('cell-list');
 				round_li.appendChild(col_ul);
-				roundobj.colobj_list.forEach(colobj => {
+				cols.forEach(col => {
 					const col_li = document.createElement('div');
 					col_li.classList.add('cell');
 					col_ul.appendChild(col_li);
-					const match = colobj.match;
-					if (match !== null) {
+					const slot = col.court in round.slots ? round.slots[col.court] : undefined;
+					const match = slot?.match;
+					if (match?.sport?.name === col.sport.name) { // TODO compare objects
 						col_li.innerHTML = [
 							'id' in match.team_home ? match.team_home.id : '?',
 							'id' in match.team_away ? match.team_away.id : '?',
