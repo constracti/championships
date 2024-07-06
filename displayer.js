@@ -46,9 +46,9 @@ function displayer(program) {
 
 	// attach matches
 	program.forEach(round => {
-		const dayobj_json = round.date.toJSON().slice(0, 10);
+		const dayobj_json = round.dzone.day.date.toJSON().slice(0, 10);
 		const dayobj = dayobj_list[dayobj_dict[dayobj_json]];
-		const zoneobj = dayobj.zoneobj_list[round.zone.rank];
+		const zoneobj = dayobj.zoneobj_list[round.dzone.zone.rank];
 		const roundobj = zoneobj.roundobj_list[round.rank - 1];
 		Object.values(round.slots).forEach(slot => {
 			if (slot.match === null)

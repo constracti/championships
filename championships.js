@@ -65,7 +65,6 @@ function pair_teams(remaining_games,group,matches){
 						let new_rem = {...remaining_games};
 						new_rem[th.name]-=1;
 						new_rem[ta.name]-=1;
-						console.log('hi');
 						result=pair_teams(new_rem,group,newMatches);
 						if (result){
 							return result;
@@ -82,35 +81,17 @@ function pair_teams(remaining_games,group,matches){
 // TODO what happens when produced is called multiple times?
 function produce() {
 
-	// produce courts {}
+	// produce court metric (to know which court has more games in a given time)
 
-	courts.forEach(court => {
+	config.courts.forEach(court => {
 		crts[court] = 0;
 	});
-
-	// produce slots
-	const slots = [];
-	rounds.forEach(round => {
-		courts.forEach(court => {
-			const slot = {
-				//round: round,//this may not be needed (recursive reasons)
-				court: court,
-				match: null,
-			};
-			round.slots[court] = slot;
-			slots.push(slot);
-		});
-	});
-
-	console.log('slots: ' + slots.length);
-	console.log(rounds);
-	console.log(slots);
 	
 
 	
 	
 	//produce matches from groups
-	Object.values(groups).forEach(gr => {
+	Object.values(config.groups).forEach(gr => {
 		let total_matches = (gr.team_matches * gr.teams.length)/2;
 		if (total_matches % ((gr.teams.length * (gr.teams.length - 1)) / 2) === 0){ //if the teams play against each other x times exactly. 
 			for (let i = 0; i < gr.team_matches/(gr.teams.length-1); i++){
@@ -139,7 +120,7 @@ function produce() {
 					let remaining_games = {};
 					gr.teams.forEach(t => {
 						remaining_games[t.name] = gr.team_matches;
-						console.log(remaining_games,gr);
+						//console.log(remaining_games,gr);
 					});
 					matches=pair_teams(remaining_games,gr,matches);
 				}
@@ -154,7 +135,7 @@ function produce() {
 	});
 
 	//produce matches from knockouts
-	Object.values(knockouts).forEach(kn => {
+	Object.values(config.knockouts).forEach(kn => {
 		matches.push({
 			id: kn.id,
 			sport: kn.sport,
@@ -169,10 +150,9 @@ function produce() {
 
 
 	console.log('matches: ' + matches.length);
-
-	// TODO scheduler should accept only two arguments: slots and matches -> Done. i need rounds instead of slots
-	let program = ScheduleMatchesDefault(matches, rounds);
-	console.log(program);
+	console.log(config.days);
+	let program = ScheduleMatchesDefault(matches, config.days);
+	console.log('finished',program);
 
 	try {
 		if (program)
@@ -183,3 +163,12 @@ function produce() {
 		alert(error.toString());
 	}
 }
+
+document.addEventListener('championships_config_parsed', started => {
+
+	console.log('started');
+	started.preventDefault();
+	produce();
+
+
+})

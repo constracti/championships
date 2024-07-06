@@ -87,13 +87,13 @@ function parse_day_line(line) {
 	day_rounds.forEach((rounds, zone) => {
 		// Q: skip if rounds === 0?
 		const dzone = {
-			day: day,
+			//day: day,
 			zone: config.zones[zone],
 			rounds: [],
 		};
 		for (let rank = 0; rank < rounds; rank++) {
 			dzone.rounds.push({
-				dzone: dzone,
+				//dzone: dzone,
 				rank: rank,
 				slots: {},
 			});
@@ -301,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
 						return parse_knockout_line(line);
 				}
 			});
-
+			//console.log(config.days);
 			// sort days
 			config.days.sort((day1, day2) => day1.date.getTime() - day2.date.getTime());
 
@@ -311,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					dzone.rounds.forEach(round => {
 						config.courts.forEach(court => {
 							slot = {
-								round: round,
+								//round: round,
 								court: court,
 								match: null,
 							};
@@ -320,6 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					});
 				});
 			});
+			console.log(config);
 
 			document.dispatchEvent(new Event('championships_config_parsed'));
 
