@@ -1,4 +1,3 @@
-// TODO run code using document.addEventListener('championships_config_parsed', () => {})
 // TODO scheduler should attach produced matches to an object formed as the config.days
 
 let matches = [];
@@ -153,22 +152,22 @@ function produce() {
 	console.log(config.days);
 	let program = ScheduleMatchesDefault(matches, config.days);
 	console.log('finished',program);
+	global_program = program;
 
-	try {
+	// TODO uncomment try catch block
+	//try {
 		if (program)
 			displayer(program);
 		else
 			throw new Error(`cannot produce the program with those parameters`);
-	} catch (error) {
-		alert(error.toString());
-	}
+	//} catch (error) {
+	//	alert(error.toString());
+	//}
 }
 
-document.addEventListener('championships_config_parsed', started => {
+let global_program = null;
 
+document.addEventListener('championships_config_parsed', () => {
 	console.log('started');
-	started.preventDefault();
 	produce();
-
-
 })
