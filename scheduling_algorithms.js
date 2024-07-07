@@ -328,8 +328,8 @@ function ScheduleMatchesDefault(matches,days){
 									for (let c of Object.keys(crts)){
 										if (!matches[m].sport.courts.includes(c)){
 											crts[c]+=1;//all sports must be played simultaneously, so the sports that did not used in this round are more valuable for next round.
-											if (matches[m].sport.name==="Ποδόσφαιρο"){
-												crts[c]+=2
+											if (c.includes("Ποδόσφαιρο")){
+												crts[c]+=50 //TODO this must be lower and for the courts that will host the more matches, now it is for testing purposes.
 											}
 										}
 									}

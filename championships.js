@@ -26,6 +26,19 @@ function deepCopy(obj){//simple deepCopy recursive function
 	return copy;
 }
 
+function shuffle(array) {
+	let currentIndex = array.length
+	let randomIndex;
+	while (currentIndex != 0){
+		randomIndex = Math.floor(Math.random() * currentIndex);
+		currentIndex--;
+		
+		[array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+	}
+	return array;
+}
+
+
 
 function pair_teams(remaining_games,group,matches){
 	if (Object.values(remaining_games).every(value => value === 0)){
@@ -139,7 +152,7 @@ function produce() {
 			points: 0,
 		});
 	});
-
+	matches=shuffle(matches);//randomize matches to make a different start to the schedule
 	console.log('matches: ' + matches.length);
 	console.log(config.days);
 	let program = ScheduleMatchesDefault(matches, config.days);
