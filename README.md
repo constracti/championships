@@ -118,7 +118,7 @@ The knockout code is a single word. Knockouts with the same code are not allowed
 An expression may take one of the following three forms:
 
 + a single integer: The team with this index is selected.
-+ a group code and an integer separated by a color (`:`): The team with the corresponding ranking within the group is selected.
++ a group code and an integer separated by a colon (`:`): The team with the corresponding ranking within the group is selected.
 + a knockout code and one of the uppercase letters `W` or `L`: Winner or loser of the corresponding knockout match is selected.
 
 #### examples
