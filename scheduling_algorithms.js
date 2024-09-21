@@ -113,6 +113,9 @@ function ScheduleMatchesDefault(matches,days){
 											}
 									}
 								}
+								if (days[d].dzones[dz].rounds.length<2 && matches[m].sport.name==="Μπέιζμπολ"){
+									scheduled = true;
+								}
 								let too_late=false;
 								/*for (let date=d; date>=0; date--){
 									for (let dzl = 0; dzl< days[date].dzones.length; dzl++){//for every zone of the day
@@ -242,6 +245,11 @@ function ScheduleMatchesDefault(matches,days){
 														//console.log('points+0.5 in different sport games');
 													}
 												}
+												if (days[d].dzones[dz].rounds[prev_round].slots[sl].match.sport.name=== "Μπέιζμπολ" || (matches[m].sport.name==="Μπέιζμπολ" && days[d].dzones[dz].rounds[prev_round].slots[sl].court.includes("Π Ποδόσφαιρο"))){
+													if (days[d].dzones[dz].rounds[r].slots[s].court.includes("Π Ποδόσφαιρο")){
+														scheduled=true;
+													}	
+												}
 											}
 										}
 									}
@@ -284,6 +292,11 @@ function ScheduleMatchesDefault(matches,days){
 														//matches[m].points+=0.5;//1/(sports.length-1);
 														//console.log('points+0.5 in different sport games');
 													}
+												}
+												if (days[d].dzones[dz].rounds[next_round].slots[sl].match.sport.name=== "Μπέιζμπολ" || (matches[m].sport.name==="Μπέιζμπολ" && days[d].dzones[dz].rounds[next_round].slots[sl].court.includes("Π Ποδόσφαιρο"))){
+													if (days[d].dzones[dz].rounds[r].slots[s].court.includes("Π Ποδόσφαιρο")){
+														scheduled=true;
+													}	
 												}
 											}
 										}
@@ -357,7 +370,7 @@ function ScheduleMatchesDefault(matches,days){
 							else if (days[d].dzones[dz].rounds[r].slots[s].match === null && matches[m].sport.courts.includes(days[d].dzones[dz].rounds[r].slots[s].court) && typeof (matches[m].team_home.name) === 'undefined' && typeof (matches[m].team_away.name) === 'undefined'){
 								//console.log(matches[m].id,matches[m].team_home.name,matches[m].team_away.name,matches[m].points,matches[m].sequence,'KN GAME')
 								let scheduled_k = false;
-								if (matches[m].team_home.type === 'group' || matches[m].team_away.type === 'group'){
+								if (matches[m].team_home.type === 'group' || matches[m].team_away.type === 'group' || (matches[m].team_home.type === 'knockout' && matches[m].team_away.type === 'knockout' && matches[m].sport.name==="Μπέιζμπολ")){
 									let group_finished = true;
 									
 									for (let mg=0; mg<matches.length; mg++){
@@ -414,7 +427,7 @@ function ScheduleMatchesDefault(matches,days){
 													if (days[ddate].dzones[ddz].rounds[drr]){
 														for (let sdate of Object.keys(days[ddate].dzones[ddz].rounds[drr].slots)){
 															if (days[ddate].dzones[ddz].rounds[drr].slots[sdate].match !== null){
-																if (days[ddate].dzones[ddz].rounds[drr].slots[sdate].match.team_home.type === 'knockout' || days[ddate].dzones[ddz].rounds[drr].slots[sdate].match.team_away.type === 'knockout'){
+																if ((days[ddate].dzones[ddz].rounds[drr].slots[sdate].match.team_home.type === 'knockout' || days[ddate].dzones[ddz].rounds[drr].slots[sdate].match.team_away.type === 'knockout') && days[ddate].dzones[ddz].rounds[drr].slots[sdate].match.sport.name!=="Μπέιζμπολ"){
 																	too_late = true;//this is a group type kn game indicating that is less special than a knockout type kn game, thus it must be placed earlier
 																	//console.log(days[ddate].dzones[ddz]);
 																	break;
@@ -462,7 +475,34 @@ function ScheduleMatchesDefault(matches,days){
 													scheduled_k = true;
 													break;
 												}
+
+											}/*
+											let prev_round=r-1
+											let next_round=r+1
+											if (prev_round>=0 && r !== 0){//for previous round
+												for (let sl of Object.keys(crts)){
+													if (days[d].dzones[dz].rounds[prev_round].slots[sl].match !== null && typeof (days[d].dzones[dz].rounds[prev_round].slots[sl].match.team_home.name) !== 'undefined' && typeof (days[d].dzones[dz].rounds[prev_round].slots[sl].match.team_home.name) !== 'undefined'){
+														if (days[d].dzones[dz].rounds[prev_round].slots[sl].match.sport.name=== "Μπέιζμπολ" || (matches[m].sport.name==="Μπέιζμπολ" && days[d].dzones[dz].rounds[prev_round].slots[sl].court.includes("Π Ποδόσφαιρο"))){
+															if (days[d].dzones[dz].rounds[r].slots[s].court.includes("Π Ποδόσφαιρο")){
+																scheduled_k=true;
+															}	
+														}
+													}
+												}
 											}
+											if (next_round<days[d].dzones[dz].rounds.length){//for next round
+												for (let sl of Object.keys(crts)){
+													if (days[d].dzones[dz].rounds[next_round].slots[sl].match !== null){
+														if (days[d].dzones[dz].rounds[next_round].slots[sl].match.sport.name=== "Μπέιζμπολ"){
+															if (days[d].dzones[dz].rounds[r].slots[s].court.includes("Π Ποδόσφαιρο")){
+																scheduled_k=true;
+															}	
+														}
+													}
+												}
+											}*/
+											
+
 											//console.log('sk',scheduled_k,'FOR GROUP KN');
 											if (!scheduled_k){
 												let newdays=deepCopy(days);
@@ -479,7 +519,7 @@ function ScheduleMatchesDefault(matches,days){
 										}
 									}
 								}
-								else if (matches[m].team_home.type === 'knockout' && matches[m].team_away.type === 'knockout'){
+								else if (matches[m].team_home.type === 'knockout' && matches[m].team_away.type === 'knockout' && matches[m].sport.name!=="Μπέιζμπολ"){
 									
 									let knockout_finished = true;
 									
@@ -579,7 +619,31 @@ function ScheduleMatchesDefault(matches,days){
 													scheduled_k = true;
 													break;
 												}
+											}/*
+											let prev_round=r-1
+											let next_round=r+1
+											if (prev_round>=0 && r !== 0){//for previous round
+												for (let sl of Object.keys(crts)){
+													if (days[d].dzones[dz].rounds[prev_round].slots[sl].match !== null){
+														if (days[d].dzones[dz].rounds[prev_round].slots[sl].match.sport.name=== "Μπέιζμπολ"){
+															if (days[d].dzones[dz].rounds[r].slots[s].court.includes("Π Ποδόσφαιρο")){
+																scheduled_k=true;
+															}	
+														}
+													}
+												}
 											}
+											if (next_round<days[d].dzones[dz].rounds.length){//for next round
+												for (let sl of Object.keys(crts)){
+													if (days[d].dzones[dz].rounds[next_round].slots[sl].match !== null){
+														if (days[d].dzones[dz].rounds[next_round].slots[sl].match.sport.name=== "Μπέιζμπολ"){
+															if (days[d].dzones[dz].rounds[r].slots[s].court.includes("Π Ποδόσφαιρο")){
+																scheduled_k=true;
+															}	
+														}
+													}
+												}
+											}*/
 											//console.log('sk',scheduled_k,'FOR KNOCKOUT');
 											if (!scheduled_k){
 												let newdays=deepCopy(days);
@@ -618,7 +682,31 @@ function ScheduleMatchesDefault(matches,days){
 											scheduled_k = true;
 											break;
 										}
+									}/*
+									let prev_round=r-1
+									let next_round=r+1
+									if (prev_round>=0 && r !== 0){//for previous round
+										for (let sl of Object.keys(crts)){
+											if (days[d].dzones[dz].rounds[prev_round].slots[sl].match !== null){
+												if (days[d].dzones[dz].rounds[prev_round].slots[sl].match.sport.name=== "Μπέιζμπολ"){
+													if (days[d].dzones[dz].rounds[r].slots[s].court.includes("Π Ποδόσφαιρο")){
+														scheduled_k=true;
+													}	
+												}
+											}
+										}
 									}
+									if (next_round<days[d].dzones[dz].rounds.length){//for next round
+										for (let sl of Object.keys(crts)){
+											if (days[d].dzones[dz].rounds[next_round].slots[sl].match !== null){
+												if (days[d].dzones[dz].rounds[next_round].slots[sl].match.sport.name=== "Μπέιζμπολ"){
+													if (days[d].dzones[dz].rounds[r].slots[s].court.includes("Π Ποδόσφαιρο")){
+														scheduled_k=true;
+													}	
+												}
+											}
+										}
+									}*/
 									//console.log('sk',scheduled_k,'FOR FIXED');
 									if (!scheduled_k){
 										let newdays=deepCopy(days);

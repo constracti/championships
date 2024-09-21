@@ -152,6 +152,12 @@ function produce() {
 			points: 0,
 		});
 	});
+
+	for (let m = 0; m < matches.length; m++){
+		if (matches[m].sport.name==="Μπέιζμπολ"){
+			matches[m].points=100
+		}
+	}
 	matches=shuffle(matches);//randomize matches to make a different start to the schedule
 	console.log('matches: ' + matches.length);
 	console.log(config.days);
